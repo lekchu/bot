@@ -108,15 +108,16 @@ menu = st.session_state.page
 # HOME
 if menu == "🏠 Home":
     st.markdown("""
-    <div style="text-align: center; padding: 40px 20px;">
-        <h1 style="font-size: 3.5em; color: white;">POSTPARTUM DEPRESSION RISK PREDICTOR</h1>
-         <h3 style="font-size: 1.6em; color: white;">Empowering maternal health through smart technology</h3>
+    <div style="text-align: center; padding: 60px 20px;">
+        <h1 class="home-title">POSTPARTUM DEPRESSION RISK PREDICTOR</h1>
+        <h3 class="home-subtitle">Empowering maternal health through smart technology</h3>
     </div>
     """, unsafe_allow_html=True)
 
-    if st.button("📝 Start Test"):
-        st.session_state.page = "📝 Take Test"
-        st.rerun()
+    st.markdown("<div style='text-align:center;'>", unsafe_allow_html=True)
+    st.button("📝 Start Test", on_click=lambda: st.session_state.update({"page": "📝 Take Test"}))
+    st.markdown("</div>", unsafe_allow_html=True)
+
 
 # TEST PAGE
 elif menu == "📝 Take Test":
