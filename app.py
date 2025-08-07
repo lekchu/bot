@@ -330,7 +330,6 @@ elif menu == "🧰 Resources":
             </div>
         """, unsafe_allow_html=True)
 
-
 # --- Session State Initialization ---
 if 'show_chat' not in st.session_state:
     st.session_state['show_chat'] = False
@@ -514,16 +513,25 @@ momly_support = {
 }
 
 # --- MOMLY Chat Display ---
+# New state variable to control detailed content visibility
+if 'show_momly_details' not in st.session_state:
+    st.session_state['show_momly_details'] = False
+
 if st.session_state['show_chat']:
     with st.expander("💬 MOMLY is here for you", expanded=True):
         st.write("Hi! I'm MOMLY, your support buddy. How are you feeling today?")
+        
         feeling = st.radio("Choose your feeling:", list(momly_support.keys()), horizontal=True, key="feeling_radio")
 
-        if st.button("🎗️ Get Comforting Tips"):
-            if feeling in momly_support:
-                content = momly_support[feeling]
-                st.success(content["message"])
+        if feeling:
+            content = momly_support[feeling]
+            st.success(content["message"])
 
+            if st.button("🎗️ Show me what to do"):
+                st.session_state['show_momly_details'] = True
+                st.rerun()
+
+            if st.session_state['show_momly_details']:
                 st.subheader("🌱 Tips")
                 for i, tip in enumerate(content["tips"], 1):
                     st.markdown(f"- **Tip {i}:** {tip}")
@@ -537,10 +545,12 @@ if st.session_state['show_chat']:
 
                 st.subheader("🎯 Mind Distraction")
                 st.info(content["distraction"])
-            else:
-                st.warning("Please select a feeling.")
 
-        st.button("🔄 Reset Chat", on_click=lambda: st.session_state.update({'show_chat': False, 'feeling': None}))
+        if st.button("🔄 Reset Chat"):
+            st.session_state['show_chat'] = False
+            st.session_state['show_momly_details'] = False
+            st.session_state.pop('feeling_radio', None)
+            st.rerun()
 
 # --- Footer ---
 st.markdown("""
