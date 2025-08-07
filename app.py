@@ -10,7 +10,7 @@ st.set_page_config(page_title="PPD Risk Predictor", page_icon="🧠", layout="wi
 st.markdown("""
     <style>
     [data-testid="stSidebar"] {
-        background-image: url("background.png");
+        background-image: url("PM.png");
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
