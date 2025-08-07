@@ -228,64 +228,130 @@ elif menu == "🧰 Resources":
     """)
 if "momly_visible" not in st.session_state:
   st.session_state.momly_visible = False
-    
 import streamlit as st
 from PIL import Image
+import os
 
-# Set page config
-st.set_page_config(page_title="PPD Predictor", layout="wide")
-
-# Optional custom CSS for floating avatar and style
-st.markdown("""
-    <style>
-    .avatar-container {
-        position: fixed;
-        bottom: 30px;
-        right: 30px;
-        z-index: 100;
-        cursor: pointer;
+# Define feelings
+feelings_data = {
+    "Sad": {
+        "tips": [
+            "Take a short walk in fresh air.",
+            "Write 3 things you're grateful for.",
+            "Talk to a friend or family member.",
+            "Listen to your favorite calming music.",
+            "Practice deep breathing for 3 minutes.",
+            "Drink a warm cup of tea.",
+            "Give yourself permission to rest."
+        ],
+        "video": "https://www.youtube.com/watch?v=ZToicYcHIOU"  # Guided meditation
+    },
+    "Tired": {
+        "tips": [
+            "Try a power nap (10–20 mins).",
+            "Stretch your body gently.",
+            "Limit screen time for a while.",
+            "Hydrate with water or herbal tea.",
+            "Breathe deeply for 5 minutes.",
+            "Give yourself rest without guilt.",
+            "Listen to relaxing sleep sounds."
+        ],
+        "video": "https://www.youtube.com/watch?v=1vx8iUvfyCY"
+    },
+    "Anxious": {
+        "tips": [
+            "Do a 4-7-8 breathing exercise.",
+            "Write down what worries you.",
+            "Focus on things around you (5 senses).",
+            "Repeat a calming affirmation.",
+            "Move your body lightly.",
+            "Pause and listen to calming music.",
+            "Avoid caffeine for a while."
+        ],
+        "video": "https://www.youtube.com/watch?v=MIr3RsUWrdo"
+    },
+    "Lonely": {
+        "tips": [
+            "Send a message to someone you miss.",
+            "Join an online community group.",
+            "Go for a short walk outside.",
+            "Write in a journal about how you feel.",
+            "Read a comforting book or poem.",
+            "Remind yourself: you’re not alone.",
+            "Watch something uplifting."
+        ],
+        "video": "https://www.youtube.com/watch?v=WVz8ygN0JDk"
+    },
+    "Angry": {
+        "tips": [
+            "Pause. Take deep breaths before reacting.",
+            "Step away from the situation briefly.",
+            "Punch a pillow or squeeze a stress ball.",
+            "Journal your emotions.",
+            "Talk it out with someone safe.",
+            "Listen to calming music.",
+            "Do something active to release tension."
+        ],
+        "video": "https://www.youtube.com/watch?v=DbO3e4EDsT8"
+    },
+    "Overwhelmed": {
+        "tips": [
+            "Write down your top 3 priorities.",
+            "Break tasks into smaller steps.",
+            "Ask for help or delegate something.",
+            "Do one thing at a time.",
+            "Breathe: inhale for 4, exhale for 6.",
+            "Take a 10-minute break.",
+            "Remind yourself you’re doing enough."
+        ],
+        "video": "https://www.youtube.com/watch?v=hnpQrMqDoqE"
     }
-    </style>
-""", unsafe_allow_html=True)
+}
 
-# MOMLY avatar toggle logic
-if 'show_momly' not in st.session_state:
-    st.session_state['show_momly'] = False
+# App title
+st.markdown("### Hi, I'm **MOMLY!** How are you feeling today?")
 
-# Show greeting
-st.markdown("### Hi, I'm **MOMLY**! How are you feeling today?")
-
-# Mood buttons
-cols = st.columns([1, 1])
-with cols[0]:
-    st.button("Sad", key="sad")
-with cols[1]:
-    st.button("Tired", key="tired")
-
-# -- Removed the predictor and start test section --
-
-# Insert your chatbot logic inside this function
-def show_momly_chat():
-    st.markdown("#### 💬 MOMLY is here to chat with you")
-    user_input = st.text_input("Type your message...", key="momly_input")
-    if user_input:
-        st.write("👩‍⚕️ MOMLY:", "You're not alone. I'm here for you 💖")  # Replace with real logic
-        # Add more rule-based or tip-based responses here
-
-# Floating avatar image
-avatar = Image.open("ce092388-046f-47ab-a503-0e19bcc8ff4e.png")
-st.markdown(
-    f"""
-    <div class="avatar-container">
-        <img src="data:image/png;base64,{st.image(avatar, use_column_width=False).image_to_url()}" width="60" onclick="window.location.reload()">
-    </div>
-    """,
-    unsafe_allow_html=True
+# Mood selection
+selected_feeling = st.radio(
+    "", list(feelings_data.keys()), horizontal=True
 )
 
-# Workaround: Clickable avatar button to toggle chat
-if st.button("🧕 Chat with MOMLY", key="momly_toggle"):
-    st.session_state['show_momly'] = not st.session_state['show_momly']
+if selected_feeling:
+    st.success(f"Here's something for when you're feeling **{selected_feeling}**:")
+    for i, tip in enumerate(feelings_data[selected_feeling]["tips"], 1):
+        st.markdown(f"**Tip {i}:** {tip}")
+    st.video(feelings_data[selected_feeling]["video"])
+
+# Avatar click shows/hides chat
+with st.sidebar:
+    if os.path.exists("momly_avatar.png"):
+        if st.button("💬 Chat with MOMLY"):
+            st.session_state.show_chat = not st.session_state.get("show_chat", False)
+    else:
+        st.warning("MOMLY avatar not found.")
+
+# Floating avatar (bottom right)
+if os.path.exists("momly_avatar.png"):
+    avatar = Image.open("momly_avatar.png")
+    st.markdown(
+        f"""
+        <style>
+        .chat-avatar {{
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            z-index: 100;
+        }}
+        </style>
+        <div class="chat-avatar">
+            <a href="#momly-chat">
+                <img src="https://raw.githubusercontent.com/lekchu/bot/main/momly_avatar.png" width="70">
+            </a>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
 
 # Show chatbot only when toggled
 if st.session_state['show_momly']:
