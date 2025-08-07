@@ -227,7 +227,8 @@ elif menu == "🧰 Resources":
     - [📝 Postpartum Support International](https://www.postpartum.net/)
     """)
 if "momly_visible" not in st.session_state:
-st.session_state.momly_visible = False
+  st.session_state.momly_visible = False
+    
 import base64
 
 # Load avatar image
