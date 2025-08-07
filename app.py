@@ -4,19 +4,17 @@ import joblib
 import plotly.graph_objects as go
 from fpdf import FPDF
 import base64
-from PIL import Image
-from io import BytesIO
 
-# Set page config FIRST
+# Set page config
 st.set_page_config(page_title="PPD Risk Predictor", page_icon="🧠", layout="wide")
 
-# --- CSS Styling ---
+# ---------------- STYLE ---------------- #
 st.markdown("""
     <style>
-    /* Main page background with fade animation */
+    /* Background animation */
     .stApp {
         animation: fadeBg 20s ease-in-out infinite;
-        background-image: url("PM.png");
+        background-image: url("background.png");
         background-size: cover;
         background-position: center;
         background-attachment: fixed;
@@ -29,17 +27,16 @@ st.markdown("""
         100% { filter: brightness(1); }
     }
 
-    /* Sidebar with background image */
+    /* Sidebar background image */
     [data-testid="stSidebar"] {
         background-image: url("PM.png");
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
         min-height: 100vh;
-        color: white;
     }
 
-    /* Navigation container inside sidebar */
+    /* Sidebar menu container */
     [data-testid="stSidebar"] .css-ng1t4o,
     [data-testid="stSidebar"] .css-1v3fvcr {
         background-color: rgba(0, 0, 0, 0.4);
@@ -47,12 +44,25 @@ st.markdown("""
         border-radius: 10px;
     }
 
+    /* Sidebar text styling */
     [data-testid="stSidebar"] label {
         color: white !important;
-        font-weight: bold;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.95rem;
+        padding: 6px 12px;
     }
 
-    /* Home page headline text */
+    /* Remove radio arrows */
+    [data-testid="stSidebar"] .stRadio > div {
+        gap: 0px !important;
+    }
+
+    [data-testid="stSidebar"] .stRadio div[role="radiogroup"] > label::before {
+        display: none;
+    }
+
+    /* Glowing home title */
     .home-title {
         font-size: 3.5em;
         color: white;
@@ -65,7 +75,7 @@ st.markdown("""
         font-style: italic;
     }
 
-    /* Floating animated heart */
+    /* Floating heart animation */
     .floating-heart {
         position: fixed;
         bottom: 20px;
@@ -80,77 +90,28 @@ st.markdown("""
         50%  { transform: translateY(-10px); }
         100% { transform: translateY(0px); }
     }
-
-    /* New CSS for the Start Test button background */
-    .st-emotion-cache-1px00h4 button {
-        background-color: #f06292; /* A vibrant pink background */
-        color: white;
-        font-weight: bold;
-        padding: 15px 30px;
-        border-radius: 10px;
-        border: none;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-        transition: all 0.3s ease;
-    }
-
-    .st-emotion-cache-1px00h4 button:hover {
-        background-color: #e91e63; /* Darker pink on hover */
-        transform: translateY(-2px);
-        box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3);
-    }
-
-    /* MOMLY chat button styling */
-    .avatar-container {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        z-index: 9999;
-    }
-
-    .avatar-container button {
-        background-color: #f06292;
-        color: white;
-        font-size: 1.5rem;
-        border-radius: 50%;
-        width: 60px;
-        height: 60px;
-        border: none;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-        transition: all 0.3s ease;
-    }
-
-    .avatar-container button:hover {
-        background-color: #e91e63;
-        transform: scale(1.1);
-        box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3);
-    }
-    
     </style>
-
     <div class="floating-heart">💗</div>
 """, unsafe_allow_html=True)
 
-# --- Load ML Model ---
+# ---------------- MODEL ---------------- #
 model = joblib.load("ppd_model_pipeline.pkl")
 le = joblib.load("label_encoder.pkl")
 
-# --- Sidebar Navigation ---
+# ---------------- NAVIGATION ---------------- #
+menu_options = ["HOME", "TAKE TEST", "RESULT EXPLANATION", "FEEDBACK", "RESOURCES"]
 if "page" not in st.session_state:
-    st.session_state.page = "🏠 Home"
+    st.session_state.page = menu_options[0]
 
 with st.sidebar:
-    st.image("momly_avatar.png", width=160)  # Optional MOMLY logo/avatar
-    st.session_state.page = st.radio(
-        "Navigate",
-            ["HOME", "TAKE TEST", "RESULT EXPLANATION", "FEEDBACK", "RESOURCES"],
-            index=["HOME", "TAKE TEST", "RESULT EXPLANATION", "FEEDBACK", "RESOURCES"].index(st.session_state.page),
-        key="menu"
-    )
+    st.image("momly_avatar.png", width=160)  # optional logo
+    selected_page = st.radio("NAVIGATE", menu_options, index=menu_options.index(st.session_state.page))
+    st.session_state.page = selected_page
 
 menu = st.session_state.page
 
-# --- HOME PAGE ---
-if menu == "🏠 Home":
+# ---------------- HOME ---------------- #
+if menu == "HOME":
     st.markdown("""
     <div style="text-align: center; padding: 60px 20px;">
         <h1 class="home-title">POSTPARTUM DEPRESSION RISK PREDICTOR</h1>
@@ -158,14 +119,13 @@ if menu == "🏠 Home":
     </div>
     """, unsafe_allow_html=True)
 
-    # Wrap the button in a div to add a background to it.
     st.markdown("<div style='text-align:center;'>", unsafe_allow_html=True)
-    st.button("📝 Start Test", on_click=lambda: st.session_state.update({"page": "📝 Take Test"}))
+    st.button("START TEST", on_click=lambda: st.session_state.update({"page": "TAKE TEST"}))
     st.markdown("</div>", unsafe_allow_html=True)
 
-# TEST PAGE
-elif menu == "📝 Take Test":
-    st.header("📝 Questionnaire")
+# ---------------- TAKE TEST ---------------- #
+elif menu == "TAKE TEST":
+    st.header("QUESTIONNAIRE")
 
     for var, default in {
         'question_index': 0,
