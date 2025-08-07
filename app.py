@@ -227,17 +227,17 @@ elif menu == "🧰 Resources":
     - [📝 Postpartum Support International](https://www.postpartum.net/)
     """)
 
+import streamlit as st
 from PIL import Image
 import base64
-from io import BytesIO
 
-# Initialize session states
+# --- Session State Initialization ---
 if 'show_chat' not in st.session_state:
-    st.session_state.show_chat = False
+    st.session_state['show_chat'] = False
 if 'feeling' not in st.session_state:
-    st.session_state.feeling = None
+    st.session_state['feeling'] = None
 
-# Load avatar
+# --- Load avatar image ---
 def get_base64_avatar(image_path):
     with open(image_path, "rb") as img_file:
         b64_data = base64.b64encode(img_file.read()).decode()
@@ -245,7 +245,7 @@ def get_base64_avatar(image_path):
 
 avatar_b64 = get_base64_avatar("momly_avatar.png")
 
-# CSS for fixed avatar button
+# --- Avatar CSS + Display ---
 st.markdown(f"""
     <style>
         .chatbot-avatar {{
@@ -263,11 +263,11 @@ st.markdown(f"""
         </form>
 """, unsafe_allow_html=True)
 
-# Detect avatar click
-if "avatar_button" in st.experimental_get_query_params():
-    st.session_state.show_chat = not st.session_state.show_chat
+# --- Detect avatar click ---
+if "avatar_button" in st.query_params:
+    st.session_state['show_chat'] = not st.session_state['show_chat']
 
-# MOMLY comfort content
+# --- MOMLY Comfort Content ---
 momly_support = {
     "Sad": {
         "message": "I'm here with you. It's okay to feel sad.",
@@ -307,7 +307,7 @@ momly_support = {
         "video": "https://www.youtube.com/watch?v=ZBnPlqQFPKs",
         "distraction": "Read a short poem or doodle aimlessly."
     },
-        "Anxious": {
+    "Anxious": {
         "message": "You're not alone. Anxiety comes and goes — let's manage it together.",
         "tips": [
             "Try the 5-4-3-2-1 grounding technique.",
@@ -328,7 +328,6 @@ momly_support = {
         "video": "https://www.youtube.com/watch?v=MIr3RsUWrdo",
         "distraction": "Try coloring a mandala or sorting old photos."
     },
-
     "Overwhelmed": {
         "message": "One moment at a time. You don’t have to do it all right now.",
         "tips": [
@@ -348,7 +347,6 @@ momly_support = {
         "video": "https://www.youtube.com/watch?v=hnpQrMqDoqE",
         "distraction": "Play a simple game on your phone or water your plants."
     },
-
     "Lonely": {
         "message": "You are deeply loved, even when it doesn’t feel like it.",
         "tips": [
@@ -368,7 +366,6 @@ momly_support = {
         "video": "https://www.youtube.com/watch?v=2ZIpFytCSVc",
         "distraction": "Try journaling or creating a vision board on your phone."
     },
-
     "Angry": {
         "message": "Anger is valid. Let’s express it in a healthy way.",
         "tips": [
@@ -388,7 +385,6 @@ momly_support = {
         "video": "https://www.youtube.com/watch?v=VLPP3XmYxXg",
         "distraction": "Watch a comedy clip or sketch something messy."
     },
-
     "Lost": {
         "message": "Even when you feel lost, you're still moving forward.",
         "tips": [
@@ -408,20 +404,13 @@ momly_support = {
         "video": "https://www.youtube.com/watch?v=UNcZp3QGgRc",
         "distraction": "Organize a drawer or create a small playlist of songs you love."
     }
-
-    # Add 5 more feelings below similarly
 }
 
-# Show chatbot only if toggled
-if st.session_state.show_chat:
+# --- MOMLY Chat Display ---
+if st.session_state['show_chat']:
     with st.expander("💬 MOMLY is here for you", expanded=True):
         st.write("Hi! I'm MOMLY, your support buddy. How are you feeling today?")
-        feeling = st.radio(
-            "Choose your feeling:",
-            list(momly_support.keys()),
-            horizontal=True,
-            key="feeling_radio"
-        )
+        feeling = st.radio("Choose your feeling:", list(momly_support.keys()), horizontal=True, key="feeling_radio")
 
         if st.button("🎗️ Get Comforting Tips"):
             if feeling in momly_support:
@@ -445,8 +434,3 @@ if st.session_state.show_chat:
                 st.warning("Please select a feeling.")
 
         st.button("🔄 Reset Chat", on_click=lambda: st.session_state.update({'show_chat': False, 'feeling': None}))
-
-
-
-
-
