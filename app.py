@@ -229,32 +229,8 @@ elif menu == "🧰 Resources":
 if "momly_visible" not in st.session_state:
   st.session_state.momly_visible = False
     
-import base64
 
-# Load avatar image
-avatar_path = "maternity_care.png"
-with open(avatar_path, "rb") as f:
-    avatar_b64 = base64.b64encode(f.read()).decode("utf-8")
-
-# Toggle function (simple workaround with a button)
-st.markdown("""
-    <style>
-    .chat-avatar {
-        position: fixed;
-        bottom: 25px;
-        right: 25px;
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        box-shadow: 0 0 10px #ccc;
-        cursor: pointer;
-        z-index: 9999;
-        animation: pulse 2s infinite;
-    }
-
-    .speech-bubble {
-        position: fixed;
-        bottom: 120px;
+       
         right: 120px;
         background-color: #fff0f5;
         padding: 8px 12px;
@@ -309,65 +285,147 @@ if st.session_state.momly_visible:
 
     if "momly_mood" not in st.session_state:
         st.session_state.momly_mood = None
+import streamlit as st
+from streamlit_extras.switch_page_button import switch_page
+import time
 
-    if st.session_state.momly_mood is None:
-        st.markdown("### 🌈 How are you feeling today?")
-        cols = st.columns(4)
-        moods = {
-            "😊 Happy": "happy",
-            "😔 Sad": "sad",
-            "😟 Anxious": "anxious",
-            "😴 Tired": "tired"
-        }
-        for i, (label, mood) in enumerate(moods.items()):
-            if cols[i].button(label):
-                st.session_state.momly_mood = mood
-                st.rerun()
+# ---------- PAGE CONFIG ---------- #
+st.set_page_config(page_title="PPD Predictor", layout="wide")
+
+# ---------- STYLING ---------- #
+st.markdown("""
+    <style>
+    .avatar {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        cursor: pointer;
+        z-index: 1000;
+    }
+    .chatbox {
+        position: fixed;
+        bottom: 90px;
+        right: 20px;
+        background-color: white;
+        border: 2px solid #ccc;
+        border-radius: 10px;
+        padding: 15px;
+        width: 300px;
+        max-height: 400px;
+        overflow-y: auto;
+        z-index: 1000;
+    }
+    .reset-button {
+        background-color: #ffcccc;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: 10px;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+# ---------- STATE ---------- #
+if 'show_chat' not in st.session_state:
+    st.session_state.show_chat = False
+if 'selected_feeling' not in st.session_state:
+    st.session_state.selected_feeling = None
+if 'tip_index' not in st.session_state:
+    st.session_state.tip_index = 0
+
+# ---------- MOMLY CONTENT ---------- #
+momly_data = {
+    "Sad": {
+        "message": "I'm here for you. It's okay to feel sad. Let's get through this together ❤️",
+        "tips": [
+            "Talk to a trusted friend 💌",
+            "Listen to calming music 🎵",
+            "Take a short walk 🏞️",
+            "Try journaling your feelings 📝",
+            "Do a deep breathing exercise 🧘",
+            "Look through happy memories 📸",
+            "Drink some warm tea 🍵"
+        ],
+        "video": "https://www.youtube.com/watch?v=92i5m3tV5XY"
+    },
+    "Tired": {
+        "message": "Rest is essential. Let's take care of your energy first. 🌙",
+        "tips": [
+            "Lie down and close your eyes for 10 minutes",
+            "Drink a glass of water",
+            "Reduce screen time",
+            "Stretch your body",
+            "Take a power nap",
+            "Ask for help if you need it",
+            "Don’t be hard on yourself"
+        ],
+        "video": "https://www.youtube.com/watch?v=ZToicYcHIOU"
+    },
+    # Add more feelings here as needed
+}
+
+# ---------- CHATBOT UI ---------- #
+
+# MOMLY AVATAR
+avatar_path = "https://cdn-icons-png.flaticon.com/512/706/706830.png"  # replace with your own if needed
+st.markdown(f"<img src='{avatar_path}' class='avatar' onclick='window.location.reload();' />", unsafe_allow_html=True)
+
+# If avatar clicked (simulated by refresh for now)
+if st.session_state.show_chat:
+    st.markdown("<div class='chatbox'>", unsafe_allow_html=True)
+
+    if not st.session_state.selected_feeling:
+        st.write("Hi, I'm MOMLY! How are you feeling today?")
+        cols = st.columns(3)
+        for i, feeling in enumerate(momly_data.keys()):
+            if cols[i % 3].button(feeling):
+                st.session_state.selected_feeling = feeling
+                st.session_state.tip_index = 0
     else:
-        mood = st.session_state.momly_mood
-        st.subheader(f"💖 Tips for when you're feeling {mood.capitalize()}")
+        data = momly_data[st.session_state.selected_feeling]
+        st.write(data['message'])
+        if st.session_state.tip_index < len(data['tips']):
+            if st.button("Next Tip"):
+                st.session_state.tip_index += 1
+        if st.session_state.tip_index < len(data['tips']):
+            st.write("✅ " + data['tips'][st.session_state.tip_index])
+        else:
+            st.write("You're doing great. Here's a calming video:")
+            st.video(data['video'])
 
-        tips = {
-            "happy": [
-                "Keep a gratitude journal 📖",
-                "Share your joy with loved ones 💬",
-                "Go for a nature walk 🌿",
-                "Dance to your favorite music 🎶",
-                "Create a memory box 🎁",
-                "Record a happy video diary 🎥",
-                "Try a fun craft with your baby 🎨"
-            ],
-            "sad": [
-                "Talk to a trusted friend 💌",
-                "Listen to calming music 🎵",
-                "Write your feelings in a journal ✍️",
-                "Watch this video 🎥 [Click](https://www.youtube.com/watch?v=ZToicYcHIOU)",
-                "Drink warm tea and relax ☕",
-                "Try 5-minute guided meditation 🧘",
-                "Remind yourself: This too shall pass 🌈"
-            ],
-            "anxious": [
-                "Breathe in deeply for 4 seconds 🫁",
-                "Name 5 things you can see 👀",
-                "Take a warm shower 🚿",
-                "Watch this relaxation video 🎥 [Click](https://www.youtube.com/watch?v=inpok4MKVLM)",
-                "Limit caffeine ☕",
-                "Stretch your body 🧘",
-                "Talk to someone you trust 🤝"
-            ],
-            "tired": [
-                "Nap while the baby naps 💤",
-                "Drink water 💧",
-                "Relax your body step-by-step 🧘",
-                "Try this yoga video 🎥 [Click](https://www.youtube.com/watch?v=4pLUleLdwY4)",
-                "Say no to new tasks 🙅‍♀️",
-                "Ask for help 💞",
-                "Play calming music 🎶"
-            ]
-        }
+        if st.button("Reset Chat", key="reset_chat"):
+            st.session_state.selected_feeling = None
+            st.session_state.tip_index = 0
 
-        for t in tips[mood]:
-            st.markdown(f"✅ {t}")
+    st.markdown("</div>", unsafe_allow_html=True)
+else:
+    if st.button("💬 MOMLY Chat", key="open_chat"):
+        st.session_state.show_chat = True
+
+# ---------- MAIN CONTENT ---------- #
+st.title("PREDICTOR")
+st.markdown("### Empowering maternal health through smart technology")
+
+col1, col2 = st.columns([1, 2])
+with col1:
+    if st.button("🚀 Start Test", use_container_width=True):
+        time.sleep(0.3)
+        switch_page("Take Test")
+
+with col2:
+    st.markdown("""
+    <div style='margin-top: 50px;'>
+        <h5 style='color: deeppink;'>💬 MOMLY is here for you</h5>
+    </div>
+    """, unsafe_allow_html=True)
+
+# Optional: feel tips directly below
+st.markdown("<hr>", unsafe_allow_html=True)
+
 
         if st.button("🔄 Choose another mood"):
             st.session_state.momly_mood = None
