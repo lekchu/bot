@@ -4,17 +4,15 @@ import joblib
 import plotly.graph_objects as go
 from fpdf import FPDF
 import base64
-from streamlit_chat import message
-import openai
-import os
 
-# Load OpenAI key
-openai.api_key = os.getenv("OPENAI_API_KEY")
+# Load model and label encoder
+model = joblib.load("ppd_model_pipeline.pkl")
+le = joblib.load("label_encoder.pkl")
 
 # Page config
 st.set_page_config(page_title="PPD Risk Predictor", page_icon="🧠", layout="wide")
 
-# UI styling
+# Blue background animation
 def add_page_animation():
     st.markdown("""
     <style>
@@ -30,23 +28,9 @@ def add_page_animation():
     </style>
     """, unsafe_allow_html=True)
 
-def enhance_chat_ui():
-    st.markdown("""
-    <style>
-    .block-container {
-        padding-bottom: 160px;
-    }
-    </style>
-    """, unsafe_allow_html=True)
-
 add_page_animation()
-enhance_chat_ui()
 
-# Load model and label encoder
-model = joblib.load("ppd_model_pipeline.pkl")
-le = joblib.load("label_encoder.pkl")
-
-# Navigation
+# Sidebar navigation
 if "page" not in st.session_state:
     st.session_state.page = "🏠 Home"
 
@@ -64,7 +48,7 @@ if menu == "🏠 Home":
     st.markdown("""
     <div style="text-align: center; padding: 40px 20px;">
         <h1 style="font-size: 3.5em; color: white;">POSTPARTUM DEPRESSION RISK PREDICTOR</h1>
-        <h3 style="font-size: 1.6em; color: white;">Empowering maternal health through smart technology</h3>
+         <h3 style="font-size: 1.6em; color: white;">Empowering maternal health through smart technology</h3>
     </div>
     """, unsafe_allow_html=True)
 
@@ -72,7 +56,7 @@ if menu == "🏠 Home":
         st.session_state.page = "📝 Take Test"
         st.rerun()
 
-# TAKE TEST
+# TEST PAGE
 elif menu == "📝 Take Test":
     st.header("📝 Questionnaire")
 
@@ -128,7 +112,7 @@ elif menu == "📝 Take Test":
 
     if 1 <= idx <= 10:
         q_text, options = q_responses[idx - 1]
-        choice = st.radio(f"{idx}. {q_text}", list(options.keys()), key=f"q_{idx}")
+        choice = st.radio(f"{idx}. {q_text}", list(options.keys()), key=f"q{idx}")
         col1, col2 = st.columns(2)
         if col1.button("⬅️ Back") and idx > 1:
             st.session_state.question_index -= 1
@@ -159,7 +143,7 @@ elif menu == "📝 Take Test":
         pred_label = le.inverse_transform([pred_encoded])[0]
 
         st.success(f"{name}, your predicted PPD Risk is: **{pred_label}**")
-        st.markdown("<p style='color:#ccc; font-style:italic;'>Note: This result is based on the EPDS – Edinburgh Postnatal Depression Scale, a globally validated screening tool.</p>", unsafe_allow_html=True)
+        st.markdown("<p style='color:#ccc; font-style:italic;'>Note: This screening result is generated based on the EPDS – Edinburgh Postnatal Depression Scale, a globally validated tool for postpartum depression assessment.</p>", unsafe_allow_html=True)
 
         fig = go.Figure(go.Indicator(
             mode="gauge+number",
@@ -188,6 +172,7 @@ elif menu == "📝 Take Test":
         st.subheader("💡 Personalized Tips")
         st.markdown(tips.get(pred_label, "Consult a professional immediately."))
 
+        # PDF report
         pdf = FPDF()
         pdf.add_page()
         pdf.set_font("Arial", size=12)
@@ -198,7 +183,7 @@ elif menu == "📝 Take Test":
         pdf.cell(200, 10, txt=f"Support Level: {support}", ln=True)
         pdf.cell(200, 10, txt=f"Total Score: {score}", ln=True)
         pdf.cell(200, 10, txt=f"Predicted Risk Level: {pred_label}", ln=True)
-        pdf.cell(200, 10, txt="(Based on EPDS - Edinburgh Postnatal Depression Scale)", ln=True)
+        pdf.cell(200, 10, txt="(Assessment based on the EPDS - Edinburgh Postnatal Depression Scale)", ln=True)
 
         pdf_output = f"{name.replace(' ', '_')}_PPD_Result.pdf"
         pdf.output(pdf_output)
@@ -212,23 +197,24 @@ elif menu == "📝 Take Test":
                 st.session_state.pop(key, None)
             st.rerun()
 
-# EXPLANATION
+# RESULT EXPLANATION
 elif menu == "📊 Result Explanation":
     st.header("📊 Understanding Risk Levels")
+    st.info("All assessments in this app are based on the EPDS (Edinburgh Postnatal Depression Scale), a trusted and validated 10-question tool used worldwide to screen for postpartum depression.")
     st.markdown("""
     | Risk Level | Meaning |
     |------------|---------|
     | **Mild (0)**     | Normal ups and downs |
     | **Moderate (1)** | Requires monitoring |
-    | **Severe (2)**   | Suggests clinical depression |
-    | **Profound (3)** | Needs urgent professional help |
+    | **Severe (2)**   | Suggests possible clinical depression |
+    | **Profound (3)** | Needs professional help urgently |
     """)
 
 # FEEDBACK
 elif menu == "📬 Feedback":
     st.header("📬 Share Feedback")
     name = st.text_input("Your Name")
-    message_input = st.text_area("Your Feedback")
+    message = st.text_area("Your Feedback")
     if st.button("Submit"):
         st.success("Thank you for your valuable feedback! 💌")
 
@@ -240,151 +226,148 @@ elif menu == "🧰 Resources":
     - [🌐 WHO Maternal Mental Health](https://www.who.int/news-room/fact-sheets/detail/mental-health-of-women-during-pregnancy-and-after-childbirth)
     - [📝 Postpartum Support International](https://www.postpartum.net/)
     """)
-def momly_chatbot():
-    import random
-    from datetime import datetime
-    import os
-    import csv
+    if "momly_visible" not in st.session_state:
+    st.session_state.momly_visible = False
+import base64
 
-    st.markdown("---")
-    st.markdown("<h2 style='color: deeppink;'>💬 Chat with MOMLY</h2>", unsafe_allow_html=True)
+# Load avatar image
+avatar_path = "maternity_care.png"
+with open(avatar_path, "rb") as f:
+    avatar_b64 = base64.b64encode(f.read()).decode("utf-8")
 
-    # Daily rotating quote
-    quotes = [
-        "You're doing better than you think 💛", "It's okay to cry. You're safe here 💧",
-        "Rest is part of healing 🧸", "Your emotions are valid 🌷",
-        "You are not alone 💗", "Gentle moments lead to gentle healing 🦋"
-    ]
-    st.success(f"🌸 *{quotes[datetime.now().day % len(quotes)]}*")
-
-    # Reset chat
-    if st.button("🔄 Reset Chat"):
-        for key in ["messages", "current_mood", "recommend_index"]:
-            st.session_state.pop(key, None)
-        st.rerun()
-
-    # Initialize session
-    if "messages" not in st.session_state:
-        st.session_state.messages = [{"role": "assistant", "content": "Hi 👋 I'm MOMLY. How are you feeling today?"}]
-        st.session_state.current_mood = None
-        st.session_state.recommend_index = 0
-
-    # Mood response bank
-    mood_data = {
-        "tired": {
-            "intro": "You’ve been holding a lot. That’s okay 💛 Want to try something gentle?",
-            "recommendations": [
-                ("🌬️ Breathing Exercise", "https://www.youtube.com/watch?v=aNXKjGFUlMs"),
-                ("🎵 Gentle Lullaby", "https://www.youtube.com/watch?v=k2qgadSvNyU"),
-                ("🛌 Just Rest a Moment", "Rest is healing. Even a few quiet minutes matter.")
-            ]
-        },
-        "sad": {
-            "intro": "I'm really sorry you're feeling this way 💗 I'm here for you.",
-            "recommendations": [
-                ("💬 Comforting Quote", "“This too shall pass. Be gentle with yourself.”"),
-                ("🎵 Soft Music", "https://www.youtube.com/watch?v=2OEL4P1Rz04"),
-                ("🤗 Just sit silently", "Silence is okay. I'm sitting with you.")
-            ]
-        },
-        "angry": {
-            "intro": "Anger is valid. Want help softening it gently?",
-            "recommendations": [
-                ("📝 Journal Prompt", "Write: What triggered this anger? What does it need from me?"),
-                ("🎵 Calming Track", "https://www.youtube.com/watch?v=1ZYbU82GVz4"),
-                ("😤 Deep Breaths", "Inhale slowly, exhale gently... you're safe now.")
-            ]
-        },
-        "anxious": {
-            "intro": "Anxiety feels like a storm. I'm with you through it 🕊️",
-            "recommendations": [
-                ("🎧 Guided Meditation", "https://www.youtube.com/watch?v=MIr3RsUWrdo"),
-                ("📖 Soothing Affirmation", "“I am safe. I am doing my best. That is enough.”"),
-                ("🤲 Grounding Exercise", "Name 5 things you can see. You're here, now.")
-            ]
-        },
-        "happy": {
-            "intro": "That’s so lovely to hear 😊 Want to make it last?",
-            "recommendations": [
-                ("🎶 Joyful Music", "https://www.youtube.com/watch?v=ZbZSe6N_BXs"),
-                ("📝 Write what made you smile", "Even tiny joys are worth remembering 💌"),
-                ("🕺 Move a little", "Dance, stretch, wiggle — feel the joy in your body ✨")
-            ]
-        }
+# Toggle function (simple workaround with a button)
+st.markdown("""
+    <style>
+    .chat-avatar {
+        position: fixed;
+        bottom: 25px;
+        right: 25px;
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        box-shadow: 0 0 10px #ccc;
+        cursor: pointer;
+        z-index: 9999;
+        animation: pulse 2s infinite;
     }
 
-    # Display past messages
-    for i, msg in enumerate(st.session_state.messages):
-        bg = "#ffc0cb" if msg["role"] == "assistant" else "#ffffff"
-        st.markdown(
-            f"<div style='background-color:{bg}; padding: 10px; border-radius: 10px; margin:5px 0; color:black'>{msg['content']}</div>",
-            unsafe_allow_html=True
-        )
+    .speech-bubble {
+        position: fixed;
+        bottom: 120px;
+        right: 120px;
+        background-color: #fff0f5;
+        padding: 8px 12px;
+        border-radius: 12px;
+        color: deeppink;
+        box-shadow: 0 0 10px #ccc;
+        font-size: 14px;
+        z-index: 9999;
+        animation: fadeIn 2s ease-in;
+    }
 
-    # Mood buttons — only if none selected yet
-    if st.session_state.current_mood is None:
-        st.markdown("**How are you feeling right now?**")
-        cols = st.columns(5)
-        moods = ["😞 Sad", "😴 Tired", "😡 Angry", "😊 Happy", "😰 Anxious"]
-        mood_keys = ["sad", "tired", "angry", "happy", "anxious"]
-        for i in range(5):
-            if cols[i].button(moods[i]):
-                mood = mood_keys[i]
-                st.session_state.current_mood = mood
-                st.session_state.recommend_index = 0
-                st.session_state.messages.append({"role": "user", "content": moods[i]})
-                st.session_state.messages.append({"role": "assistant", "content": mood_data[mood]["intro"]})
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    </style>
+
+    <script>
+    const avatar = document.getElementById("momly-avatar");
+    if (avatar) {
+        avatar.onclick = function() {
+            window.parent.postMessage({type: 'toggle_momly'}, '*');
+        }
+    }
+    </script>
+""", unsafe_allow_html=True)
+
+# Button to toggle visibility
+avatar_clicked = st.button(" ", key="momly_button", help="Open MOMLY Chat 💬")
+
+if avatar_clicked:
+    st.session_state.momly_visible = not st.session_state.momly_visible
+
+# Display avatar and speech bubble using HTML
+st.markdown(f"""
+    <img src="data:image/png;base64,{avatar_b64}" class="chat-avatar" />
+""", unsafe_allow_html=True)
+
+if not st.session_state.momly_visible:
+    st.markdown(f"""
+        <div class="speech-bubble">Hi, I'm MOMLY!</div>
+    """, unsafe_allow_html=True)
+if st.session_state.momly_visible:
+    st.markdown("---")
+    st.markdown("<h4 style='text-align: center; color: deeppink;'>💬 MOMLY is here for you</h4>", unsafe_allow_html=True)
+
+    if "momly_mood" not in st.session_state:
+        st.session_state.momly_mood = None
+
+    if st.session_state.momly_mood is None:
+        st.markdown("### 🌈 How are you feeling today?")
+        cols = st.columns(4)
+        moods = {
+            "😊 Happy": "happy",
+            "😔 Sad": "sad",
+            "😟 Anxious": "anxious",
+            "😴 Tired": "tired"
+        }
+        for i, (label, mood) in enumerate(moods.items()):
+            if cols[i].button(label):
+                st.session_state.momly_mood = mood
                 st.rerun()
+    else:
+        mood = st.session_state.momly_mood
+        st.subheader(f"💖 Tips for when you're feeling {mood.capitalize()}")
 
-    # Show recommendations one by one
-    mood = st.session_state.current_mood
-    if mood:
-        index = st.session_state.recommend_index
-        recs = mood_data[mood]["recommendations"]
-        if index < len(recs):
-            title, content = recs[index]
-            st.markdown(f"**{title}**")
-            if isinstance(content, str) and content.startswith("http"):
-                st.markdown(f"[👉 Click here]({content})", unsafe_allow_html=True)
-            else:
-                st.info(content)
+        tips = {
+            "happy": [
+                "Keep a gratitude journal 📖",
+                "Share your joy with loved ones 💬",
+                "Go for a nature walk 🌿",
+                "Dance to your favorite music 🎶",
+                "Create a memory box 🎁",
+                "Record a happy video diary 🎥",
+                "Try a fun craft with your baby 🎨"
+            ],
+            "sad": [
+                "Talk to a trusted friend 💌",
+                "Listen to calming music 🎵",
+                "Write your feelings in a journal ✍️",
+                "Watch this video 🎥 [Click](https://www.youtube.com/watch?v=ZToicYcHIOU)",
+                "Drink warm tea and relax ☕",
+                "Try 5-minute guided meditation 🧘",
+                "Remind yourself: This too shall pass 🌈"
+            ],
+            "anxious": [
+                "Breathe in deeply for 4 seconds 🫁",
+                "Name 5 things you can see 👀",
+                "Take a warm shower 🚿",
+                "Watch this relaxation video 🎥 [Click](https://www.youtube.com/watch?v=inpok4MKVLM)",
+                "Limit caffeine ☕",
+                "Stretch your body 🧘",
+                "Talk to someone you trust 🤝"
+            ],
+            "tired": [
+                "Nap while the baby naps 💤",
+                "Drink water 💧",
+                "Relax your body step-by-step 🧘",
+                "Try this yoga video 🎥 [Click](https://www.youtube.com/watch?v=4pLUleLdwY4)",
+                "Say no to new tasks 🙅‍♀️",
+                "Ask for help 💞",
+                "Play calming music 🎶"
+            ]
+        }
 
-            col1, col2 = st.columns(2)
-            with col1:
-                if st.button("💡 Show another", key=f"next_{index}"):
-                    st.session_state.recommend_index += 1
-                    st.rerun()
-            with col2:
-                if st.button("❌ I'm okay now", key=f"done_{index}"):
-                    st.session_state.messages.append({
-                        "role": "assistant",
-                        "content": "Okay 🧡 I'm always here if you want to talk again."
-                    })
-                    st.session_state.current_mood = None
-                    st.session_state.recommend_index = 0
-                    st.rerun()
-        else:
-            st.success("That’s all I had for now 💕 If you'd like more, you can reset the chat anytime.")
+        for t in tips[mood]:
+            st.markdown(f"✅ {t}")
 
-    # Optional: text input, always welcome
-    user_input = st.chat_input("Type something you’d like to share...")
-
-    if user_input:
-        st.session_state.messages.append({"role": "user", "content": user_input})
-        if st.session_state.current_mood is None:
-            for mood_key in mood_data:
-                if mood_key in user_input.lower():
-                    st.session_state.current_mood = mood_key
-                    st.session_state.recommend_index = 0
-                    intro = mood_data[mood_key]["intro"]
-                    st.session_state.messages.append({"role": "assistant", "content": intro})
-                    st.rerun()
-        fallback = "Thank you for sharing that. I'm here with you 🧸"
-        st.session_state.messages.append({"role": "assistant", "content": fallback})
-
-
-
-momly_chatbot()
-
-
-
+        if st.button("🔄 Choose another mood"):
+            st.session_state.momly_mood = None
+            st.rerun()
