@@ -27,7 +27,7 @@ st.set_page_config(page_title="PPD Risk Predictor", page_icon="🧠", layout="wi
 main_bg_b64 = get_base64_of_bin_file('background.png')
 sidebar_bg_b64 = get_base64_of_bin_file('PM.png')
 
-# --- CSS for App Background, Sidebar, and Animations ---
+# --- CSS for App Background and Sidebar ---
 if main_bg_b64:
     st.markdown(
         f"""
@@ -65,21 +65,6 @@ if main_bg_b64:
         div.centered-question .stRadio > label,
         div.centered-question .stRadio > div > label > div {{
             justify-content: center;
-        }}
-
-        /* CSS for the animated title */
-        @keyframes neonFlicker {{
-            0%, 19.99%, 22.01%, 24.99%, 54.99%, 57.01%, 100% {{
-                text-shadow: 0 0 4px #fff, 0 0 11px #fff, 0 0 19px #fff, 0 0 40px #f06292, 0 0 80px #f06292, 0 0 90px #f06292, 0 0 100px #f06292, 0 0 150px #f06292;
-                color: #fff;
-            }}
-            20%, 22%, 25%, 55%, 57% {{
-                text-shadow: none;
-                color: #f06292;
-            }}
-        }}
-        .animated-title {{
-            animation: neonFlicker 2s infinite alternate;
         }}
         </style>
         """,
@@ -126,7 +111,7 @@ menu = st.session_state.page
 if menu == "HOME":
     st.markdown("""
     <div style="text-align: center; padding: 40px 20px;">
-        <h1 class="animated-title" style="font-size: 3.5em; color: white;">POSTPARTUM DEPRESSION RISK PREDICTOR</h1>
+        <h1 style="font-size: 3.5em; color: white;">POSTPARTUM DEPRESSION RISK PREDICTOR</h1>
         <h3 style="font-size: 1.6em; color: white;">Empowering maternal health through smart technology</h3>
     </div>
     """, unsafe_allow_html=True)
