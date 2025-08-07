@@ -89,7 +89,7 @@ except FileNotFoundError:
 
 
 # --- Sidebar navigation ---
-nav_options = ["HOME", "TAKE TEST", "RESULT EXPLANATION", "FEEDBACK", "🧰 RESOURCES"]
+nav_options = ["HOME", "TAKE TEST", "RESULT EXPLANATION", "FEEDBACK", "RESOURCES"]
 
 # Corrected logic to prevent ValueError
 if "page" not in st.session_state or st.session_state.page not in nav_options:
@@ -287,8 +287,8 @@ elif menu == "FEEDBACK":
             st.success("Thank you for your valuable feedback! 💌")
             st.balloons()
 
-elif menu == "🧰 RESOURCES":
-    st.markdown("<h2 style='color: #f06292;'>🧰 HELPFUL LINKS AND SUPPORT</h2>", unsafe_allow_html=True)
+elif menu == "RESOURCES":
+    st.markdown("<h2 style='color: #f06292;'>HELPFUL LINKS AND SUPPORT</h2>", unsafe_allow_html=True)
     st.markdown("<p style='color: #ccc;'>Here are some trusted resources for maternal mental health support and crisis assistance.</p>", unsafe_allow_html=True)
 
     resources = [
