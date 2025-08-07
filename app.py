@@ -256,42 +256,18 @@ def show_avatar_button():
             bottom: 20px;
             right: 20px;
             z-index: 9999;
-            display: flex;
-            align-items: center; /* Vertically centers the items */
-            gap: 10px; /* Adds space between the text and the button */
-        }
-        @keyframes slideInUp {
-            from {
-                transform: translateY(20px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-        .animated-momly-text {
-            animation: slideInUp 0.8s ease-out; /* The animation */
-            font-size: 16px;
-            font-weight: bold;
-            color: #4CAF50; /* Adjust color as needed */
         }
         </style>
         <div class="avatar-container">
         """, unsafe_allow_html=True)
 
-    # Use Streamlit columns to place the animated text and button side-by-side
     avatar_col1, avatar_col2, avatar_col3 = st.columns([8, 1, 1])
-    with avatar_col2:
-        st.markdown('<p class="animated-momly-text">Hi, I\'m MOMLY</p>', unsafe_allow_html=True)
     with avatar_col3:
         if st.button("💬", help="Click to chat with MOMLY"):
             st.session_state.show_chat = not st.session_state.show_chat
 
     st.markdown("</div>", unsafe_allow_html=True)
 
-# Show avatar button
-show_avatar_button()
 # Show avatar button
 show_avatar_button()
 
@@ -462,7 +438,3 @@ if st.session_state['show_chat']:
                 st.warning("Please select a feeling.")
 
         st.button("🔄 Reset Chat", on_click=lambda: st.session_state.update({'show_chat': False, 'feeling': None}))
-
-
-
-           
