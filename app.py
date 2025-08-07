@@ -5,9 +5,13 @@ import plotly.graph_objects as go
 from fpdf import FPDF
 import base64
 
+# Set page config FIRST
+st.set_page_config(page_title="PPD Risk Predictor", page_icon="🧠", layout="wide")
+
 # Load model and label encoder
 model = joblib.load("ppd_model_pipeline.pkl")
 le = joblib.load("label_encoder.pkl")
+
 # Set background image
 def set_background():
     st.markdown(
@@ -20,26 +24,17 @@ def set_background():
             background-attachment: fixed;
         }}
 
-        .block-container {{
-            background-color: rgba(0, 0, 0, 0.5);  /* semi-transparent dark overlay for readability */
+        .main > div:first-child {{
+            background-color: rgba(0, 0, 0, 0.6);  /* semi-transparent dark overlay for readability */
             padding: 2rem;
             border-radius: 10px;
         }}
-
-        .css-18e3th9 {{
-            background-color: transparent !important; /* removes white background in center */
-        }}
-
         </style>
         """,
         unsafe_allow_html=True
     )
 
 set_background()
-
-
-# Page config
-st.set_page_config(page_title="PPD Risk Predictor", page_icon="🧠", layout="wide")
 
 # Blue background animation
 def add_page_animation():
@@ -71,6 +66,7 @@ st.session_state.page = st.sidebar.radio(
 )
 
 menu = st.session_state.page
+
 
 # HOME
 if menu == "🏠 Home":
