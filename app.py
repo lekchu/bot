@@ -230,6 +230,7 @@ elif menu == "🧰 Resources":
 import streamlit as st
 from PIL import Image
 import base64
+from io import BytesIO
 
 # --- Session State Initialization ---
 if 'show_chat' not in st.session_state:
@@ -243,29 +244,33 @@ def get_base64_avatar(image_path):
         b64_data = base64.b64encode(img_file.read()).decode()
     return b64_data
 
-avatar_b64 = get_base64_avatar("momly_avatar.png")
+def show_avatar_button():
+    avatar_img = Image.open("momly_avatar.png")
+    buffered = BytesIO()
+    avatar_img.save(buffered, format="PNG")
+    img_bytes = buffered.getvalue()
 
-# --- Avatar CSS + Display ---
-st.markdown(f"""
-    <style>
-        .chatbot-avatar {{
+    st.markdown("""
+        <style>
+        .avatar-container {
             position: fixed;
             bottom: 20px;
             right: 20px;
-            z-index: 100;
-        }}
-    </style>
-    <div class="chatbot-avatar">
-        <form action="" method="post">
-            <button name="avatar_button" type="submit" style="border:none; background:none;">
-                <img src="data:image/png;base64,{avatar_b64}" width="60">
-            </button>
-        </form>
-""", unsafe_allow_html=True)
+            z-index: 9999;
+        }
+        </style>
+        <div class="avatar-container">
+        """, unsafe_allow_html=True)
 
-# --- Detect avatar click ---
-if "avatar_button" in st.query_params:
-    st.session_state['show_chat'] = not st.session_state['show_chat']
+    avatar_col1, avatar_col2, avatar_col3 = st.columns([8, 1, 1])
+    with avatar_col3:
+        if st.button("💬", help="Click to chat with MOMLY"):
+            st.session_state.show_chat = not st.session_state.show_chat
+
+    st.markdown("</div>", unsafe_allow_html=True)
+
+# Show avatar button
+show_avatar_button()
 
 # --- MOMLY Comfort Content ---
 momly_support = {
