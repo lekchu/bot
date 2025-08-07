@@ -43,6 +43,7 @@ st.session_state.page = st.sidebar.radio(
 
 menu = st.session_state.page
 
+
 # HOME
 if menu == "🏠 Home":
     st.markdown("""
@@ -64,6 +65,16 @@ elif menu == "📝 Take Test":
     for var, default in {
         'question_index': 0,
         'responses': [],
+# Add custom background to sidebar
+st.markdown("""
+    <style>
+    [data-testid="stSidebar"] {
+        background-image: url('background.png');
+        background-size: cover;
+        background-position: center;
+    }
+    </style>
+""", unsafe_allow_html=True)
         'age': 25,
         'support': "Medium",
         'name': "",
