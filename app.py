@@ -59,9 +59,9 @@ if main_bg_b64:
         }}
 
         /* Custom CSS to center the questions and options */
-        div.centered-question {
+        div.centered-question {{
             text-align: center;
-        }
+        }}
         div.centered-question .stRadio > label,
         div.centered-question .stRadio > div > label > div {{
             justify-content: center;
