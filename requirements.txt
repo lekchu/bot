@@ -5,3 +5,4 @@ plotly
 fpdf
 streamlit_chat
 openai
+scikit-learn
