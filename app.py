@@ -142,8 +142,8 @@ with st.sidebar:
     st.image("momly_avatar.png", width=160)  # Optional MOMLY logo/avatar
     st.session_state.page = st.radio(
         "Navigate",
-        ["🏠 Home", "📝 Take Test", "📊 Result Explanation", "📬 Feedback", "🧰 Resources"],
-        index=["🏠 Home", "📝 Take Test", "📊 Result Explanation", "📬 Feedback", "🧰 Resources"].index(st.session_state.page),
+        ["HOME", "TAKE TEST", "RESULT EXPLANATION", "FEEDBACK", "RESOURCES"],
+        index=["HOME", "TAKE TEST", "RESULT EXPLANATION", "FEEDBACK", "RESOURCES"].index(st.session_state.page),
         key="menu"
     )
 
