@@ -266,11 +266,6 @@ elif menu == "🧰 Resources":
                 <a href="{res['link']}" target="_blank" style="color: #f06292; text-decoration: none;">🔗 Visit Site</a>
             </div>
         """, unsafe_allow_html=True)
-st.markdown("""
-    <div style="background-color: #ffcccb; color: #222; padding: 10px; border-radius: 8px; text-align: center;">
-        If you or someone you know is in crisis, don’t wait — reach out for help now.
-    </div>
-""", unsafe_allow_html=True)
 
 
 import streamlit as st
