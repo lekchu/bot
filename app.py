@@ -7,106 +7,75 @@ import base64
 from PIL import Image
 from io import BytesIO
 
-# --- Base64 functions for background images ---
+# --- Base64 functions for background image ---
 def get_base64_of_bin_file(bin_file):
-    """Encodes a file to a base64 string."""
-    try:
-        with open(bin_file, 'rb') as f:
-            data = f.read()
-        return base64.b64encode(data).decode()
-    except FileNotFoundError:
-        st.error(f"Error: The file '{bin_file}' was not found. Please ensure it's in the same directory as your app.py file.")
-        return None
+    with open(bin_file, 'rb') as f:
+        data = f.read()
+    return base64.b64encode(data).decode()
+
+def set_png_as_page_bg(png_file):
+    bin_str = get_base64_of_bin_file(png_file)
+    page_bg_img = f'''
+    <style>
+    .stApp {{
+    background-image: url("data:image/png;base64,{bin_str}");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    }}
+    </style>
+    '''
+    st.markdown(page_bg_img, unsafe_allow_html=True)
 
 # Set page config FIRST
 st.set_page_config(page_title="PPD Risk Predictor", page_icon="🧠", layout="wide")
 
-# --- Get Base64 strings for both images ---
-main_bg_b64 = get_base64_of_bin_file('background.png')
-sidebar_bg_b64 = get_base64_of_bin_file('PM.png')
+# --- Set the background image ---
+set_png_as_page_bg('background.png')
 
-# --- CSS for App Background and Sidebar ---
-# Only apply CSS if both images are found
-if main_bg_b64 and sidebar_bg_b64:
-    st.markdown(
-        f"""
-        <style>
-        /* Main app background */
-        .stApp {{
-            background-image: url("data:image/png;base64,{main_bg_b64}");
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            background-repeat: no-repeat;
-        }}
+# --- CSS for Sidebar and Fonts ---
+st.markdown("""
+    <style>
+    [data-testid="stSidebar"] {
+        background-image: url("background.png");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
 
-        /* Navigation Sidebar background */
-        [data-testid="stSidebar"] {{
-            background-image: url("data:image/png;base64,{sidebar_bg_b64}");
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-        }}
+    /* Add a semi-transparent overlay to the sidebar for text readability */
+    [data-testid="stSidebar"] .css-ng1t4o,
+    [data-testid="stSidebar"] .css-1v3fvcr {
+        background-color: rgba(0, 0, 0, 0.4);
+        padding: 10px;
+        border-radius: 10px;
+    }
 
-        /* Add a semi-transparent overlay to the sidebar for text readability */
-        [data-testid="stSidebar"] .css-ng1t4o,
-        [data-testid="stSidebar"] .css-1v3fvcr {{
-            background-color: rgba(0, 0, 0, 0.4);
-            padding: 10px;
-            border-radius: 10px;
-        }}
+    /* Make navigation text white for better contrast */
+    [data-testid="stSidebar"] label {
+        color: white !important;
+    }
+    </style>
+""", unsafe_allow_html=True)
 
-        /* Make navigation text white for better contrast */
-        [data-testid="stSidebar"] label {{
-            color: white !important;
-        }}
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
-elif main_bg_b64:
-    # Fallback for main background if sidebar image is missing
-    st.markdown(
-        f"""
-        <style>
-        .stApp {{
-            background-image: url("data:image/png;base64,{main_bg_b64}");
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            background-repeat: no-repeat;
-        }}
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
+# Load model and label encoder
+model = joblib.load("ppd_model_pipeline.pkl")
+le = joblib.load("label_encoder.pkl")
 
-
-# --- Load model and label encoder ---
-# Added error handling for model loading
-try:
-    model = joblib.load("ppd_model_pipeline.pkl")
-    le = joblib.load("label_encoder.pkl")
-except FileNotFoundError:
-    st.error("Error: Model files 'ppd_model_pipeline.pkl' or 'label_encoder.pkl' not found. Please ensure they are in the same directory.")
-    st.stop()
-
-
-# --- Sidebar navigation ---
+# Sidebar navigation
 if "page" not in st.session_state:
     st.session_state.page = "🏠 Home"
 
-# The radio button correctly sets the state variable, which then controls the page content
 st.session_state.page = st.sidebar.radio(
     "Navigate",
-    [" Home", " Take Test", " Result Explanation", " Feedback", " Resources"],
-    index=[" Home", " Take Test", " Result Explanation", " Feedback", " Resources"].index(st.session_state.page),
+    ["🏠 Home", "📝 Take Test", "📊 Result Explanation", "📬 Feedback", "🧰 Resources"],
+    index=["🏠 Home", "📝 Take Test", "📊 Result Explanation", "📬 Feedback", "🧰 Resources"].index(st.session_state.page),
     key="menu"
 )
 
 menu = st.session_state.page
 
-# --- Page Content Logic ---
 # HOME
 if menu == "🏠 Home":
     st.markdown("""
@@ -262,8 +231,8 @@ elif menu == "📝 Take Test":
             st.rerun()
 
 # RESULT EXPLANATION
-elif menu == " Result Explanation":
-    st.header(" Understanding Risk Levels")
+elif menu == "📊 Result Explanation":
+    st.header("📊 Understanding Risk Levels")
     st.info("All assessments in this app are based on the EPDS (Edinburgh Postnatal Depression Scale), a trusted and validated 10-question tool used worldwide to screen for postpartum depression.")
     st.markdown("""
     | Risk Level | Meaning |
@@ -275,7 +244,7 @@ elif menu == " Result Explanation":
     """)
 
 # FEEDBACK
-elif menu == " Feedback":
+elif menu == "📬 Feedback":
     st.markdown("<h2 style='color: #f06292;'>📬 Share Your Feedback</h2>", unsafe_allow_html=True)
     st.markdown("<p style='color: #ddd;'>We value your input and would love to hear your thoughts or suggestions!</p>", unsafe_allow_html=True)
 
@@ -294,7 +263,7 @@ elif menu == " Feedback":
             st.success("Thank you for your valuable feedback! 💌")
             st.balloons()
 
-elif menu == " Resources":
+elif menu == "🧰 Resources":
     st.markdown("<h2 style='color: #f06292;'>🧰 Helpful Links and Support</h2>", unsafe_allow_html=True)
     st.markdown("<p style='color: #ccc;'>Here are some trusted resources for maternal mental health support and crisis assistance.</p>", unsafe_allow_html=True)
 
@@ -330,6 +299,7 @@ elif menu == " Resources":
             </div>
         """, unsafe_allow_html=True)
 
+
 # --- Session State Initialization ---
 if 'show_chat' not in st.session_state:
     st.session_state['show_chat'] = False
@@ -343,32 +313,29 @@ def get_base64_avatar(image_path):
     return b64_data
 
 def show_avatar_button():
-    try:
-        avatar_img = Image.open("momly_avatar.png")
-        buffered = BytesIO()
-        avatar_img.save(buffered, format="PNG")
-        img_bytes = buffered.getvalue()
+    avatar_img = Image.open("momly_avatar.png")
+    buffered = BytesIO()
+    avatar_img.save(buffered, format="PNG")
+    img_bytes = buffered.getvalue()
 
-        st.markdown("""
-            <style>
-            .avatar-container {
-                position: fixed;
-                bottom: 20px;
-                right: 20px;
-                z-index: 9999;
-            }
-            </style>
-            <div class="avatar-container">
-            """, unsafe_allow_html=True)
+    st.markdown("""
+        <style>
+        .avatar-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+        </style>
+        <div class="avatar-container">
+        """, unsafe_allow_html=True)
 
-        avatar_col1, avatar_col2, avatar_col3 = st.columns([8, 1, 1])
-        with avatar_col3:
-            if st.button("💬", help="Click to chat with MOMLY"):
-                st.session_state.show_chat = not st.session_state.show_chat
+    avatar_col1, avatar_col2, avatar_col3 = st.columns([8, 1, 1])
+    with avatar_col3:
+        if st.button("💬", help="Click to chat with MOMLY"):
+            st.session_state.show_chat = not st.session_state.show_chat
 
-        st.markdown("</div>", unsafe_allow_html=True)
-    except FileNotFoundError:
-        st.warning("Avatar image 'momly_avatar.png' not found.")
+    st.markdown("</div>", unsafe_allow_html=True)
 
 # Show avatar button
 show_avatar_button()
@@ -513,30 +480,21 @@ momly_support = {
 }
 
 # --- MOMLY Chat Display ---
-# New state variable to control detailed content visibility
-if 'show_momly_details' not in st.session_state:
-    st.session_state['show_momly_details'] = False
-
 if st.session_state['show_chat']:
     with st.expander("💬 MOMLY is here for you", expanded=True):
         st.write("Hi! I'm MOMLY, your support buddy. How are you feeling today?")
-        
         feeling = st.radio("Choose your feeling:", list(momly_support.keys()), horizontal=True, key="feeling_radio")
 
-        if feeling:
-            content = momly_support[feeling]
-            st.success(content["message"])
+        if st.button("🎗️ Get Comforting Tips"):
+            if feeling in momly_support:
+                content = momly_support[feeling]
+                st.success(content["message"])
 
-            if st.button("🎗️ Show me what to do"):
-                st.session_state['show_momly_details'] = True
-                st.rerun()
-
-            if st.session_state['show_momly_details']:
                 st.subheader("🌱 Tips")
                 for i, tip in enumerate(content["tips"], 1):
                     st.markdown(f"- **Tip {i}:** {tip}")
 
-                st.subheader(" Try This Activity")
+                st.subheader("🧩 Try This Activity")
                 for step in content["activity"]:
                     st.markdown(f"🔹 {step}")
 
@@ -545,12 +503,10 @@ if st.session_state['show_chat']:
 
                 st.subheader("🎯 Mind Distraction")
                 st.info(content["distraction"])
+            else:
+                st.warning("Please select a feeling.")
 
-        if st.button("🔄 Reset Chat"):
-            st.session_state['show_chat'] = False
-            st.session_state['show_momly_details'] = False
-            st.session_state.pop('feeling_radio', None)
-            st.rerun()
+        st.button("🔄 Reset Chat", on_click=lambda: st.session_state.update({'show_chat': False, 'feeling': None}))
 
 # --- Footer ---
 st.markdown("""
