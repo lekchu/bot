@@ -229,62 +229,6 @@ elif menu == "🧰 Resources":
 if "momly_visible" not in st.session_state:
   st.session_state.momly_visible = False
     
-
-       
-        right: 120px;
-        background-color: #fff0f5;
-        padding: 8px 12px;
-        border-radius: 12px;
-        color: deeppink;
-        box-shadow: 0 0 10px #ccc;
-        font-size: 14px;
-        z-index: 9999;
-        animation: fadeIn 2s ease-in;
-    }
-
-    @keyframes pulse {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.05); }
-        100% { transform: scale(1); }
-    }
-
-    @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
-    }
-    </style>
-
-    <script>
-    const avatar = document.getElementById("momly-avatar");
-    if (avatar) {
-        avatar.onclick = function() {
-            window.parent.postMessage({type: 'toggle_momly'}, '*');
-        }
-    }
-    </script>
-""", unsafe_allow_html=True)
-
-# Button to toggle visibility
-avatar_clicked = st.button(" ", key="momly_button", help="Open MOMLY Chat 💬")
-
-if avatar_clicked:
-    st.session_state.momly_visible = not st.session_state.momly_visible
-
-# Display avatar and speech bubble using HTML
-st.markdown(f"""
-    <img src="data:image/png;base64,{avatar_b64}" class="chat-avatar" />
-""", unsafe_allow_html=True)
-
-if not st.session_state.momly_visible:
-    st.markdown(f"""
-        <div class="speech-bubble">Hi, I'm MOMLY!</div>
-    """, unsafe_allow_html=True)
-if st.session_state.momly_visible:
-    st.markdown("---")
-    st.markdown("<h4 style='text-align: center; color: deeppink;'>💬 MOMLY is here for you</h4>", unsafe_allow_html=True)
-
-    if "momly_mood" not in st.session_state:
-        st.session_state.momly_mood = None
 import streamlit as st
 from streamlit_extras.switch_page_button import switch_page
 import time
@@ -425,8 +369,3 @@ with col2:
 
 # Optional: feel tips directly below
 st.markdown("<hr>", unsafe_allow_html=True)
-
-
-        if st.button("🔄 Choose another mood"):
-            st.session_state.momly_mood = None
-            st.rerun()
