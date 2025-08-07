@@ -439,3 +439,10 @@ if st.session_state['show_chat']:
                 st.warning("Please select a feeling.")
 
         st.button("🔄 Reset Chat", on_click=lambda: st.session_state.update({'show_chat': False, 'feeling': None}))
+# --- Footer ---
+st.markdown("""
+    <hr style="border: 1px solid #ccc;">
+    <div style="text-align: center; padding: 10px 0; color: #aaa; font-size: 0.9em;">
+        © 2025 MOMLY | Empowering Maternal Wellbeing 💖
+    </div>
+""", unsafe_allow_html=True)
