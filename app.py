@@ -5,13 +5,41 @@ import plotly.graph_objects as go
 from fpdf import FPDF
 import base64
 
-# Set page config
+# Set page config FIRST
 st.set_page_config(page_title="PPD Risk Predictor", page_icon="🧠", layout="wide")
-
-# ---------------- STYLE ---------------- #
 st.markdown("""
     <style>
-    /* Background animation */
+    [data-testid="stSidebar"] {
+        background-image: url("background.png");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+
+    /* Optional: add semi-transparent background to the menu text for readability */
+    [data-testid="stSidebar"] .css-ng1t4o,  /* Container */
+    [data-testid="stSidebar"] .css-1v3fvcr { /* Menu radio */
+        background-color: rgba(0, 0, 0, 0.4); 
+        padding: 10px;
+        border-radius: 10px;
+    }
+
+    /* Optional: make radio text white */
+    [data-testid="stSidebar"] label {
+        color: white !important;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+
+# Load model and label encoder
+model = joblib.load("ppd_model_pipeline.pkl")
+le = joblib.load("label_encoder.pkl")
+
+# Set animated background with image
+def add_page_animation():
+    st.markdown("""
+    <style>
     .stApp {
         animation: fadeBg 20s ease-in-out infinite;
         background-image: url("background.png");
@@ -20,112 +48,46 @@ st.markdown("""
         background-attachment: fixed;
         background-repeat: no-repeat;
     }
-
     @keyframes fadeBg {
         0% { filter: brightness(1); }
         50% { filter: brightness(1.05); }
         100% { filter: brightness(1); }
     }
-
-    /* Sidebar background image */
-    [data-testid="stSidebar"] {
-        background-image: url("PM.png");
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-        min-height: 100vh;
-    }
-
-    /* Sidebar menu container */
-    [data-testid="stSidebar"] .css-ng1t4o,
-    [data-testid="stSidebar"] .css-1v3fvcr {
-        background-color: rgba(0, 0, 0, 0.4);
-        padding: 15px;
-        border-radius: 10px;
-    }
-
-    /* Sidebar text styling */
-    [data-testid="stSidebar"] label {
-        color: white !important;
-        font-weight: 600;
-        text-transform: uppercase;
-        font-size: 0.95rem;
-        padding: 6px 12px;
-    }
-
-    /* Remove radio arrows */
-    [data-testid="stSidebar"] .stRadio > div {
-        gap: 0px !important;
-    }
-
-    [data-testid="stSidebar"] .stRadio div[role="radiogroup"] > label::before {
-        display: none;
-    }
-
-    /* Glowing home title */
-    .home-title {
-        font-size: 3.5em;
-        color: white;
-        text-shadow: 0 0 10px rgba(255, 192, 203, 0.7);
-    }
-
-    .home-subtitle {
-        font-size: 1.6em;
-        color: #f8bbd0;
-        font-style: italic;
-    }
-
-    /* Floating heart animation */
-    .floating-heart {
-        position: fixed;
-        bottom: 20px;
-        left: 20px;
-        animation: floatHeart 3s ease-in-out infinite;
-        font-size: 2.5rem;
-        z-index: 9999;
-    }
-
-    @keyframes floatHeart {
-        0%   { transform: translateY(0px); }
-        50%  { transform: translateY(-10px); }
-        100% { transform: translateY(0px); }
-    }
     </style>
-    <div class="floating-heart">💗</div>
-""", unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
 
-# ---------------- MODEL ---------------- #
-model = joblib.load("ppd_model_pipeline.pkl")
-le = joblib.load("label_encoder.pkl")
+add_page_animation()
 
-# ---------------- NAVIGATION ---------------- #
-menu_options = ["HOME", "TAKE TEST", "RESULT EXPLANATION", "FEEDBACK", "RESOURCES"]
+# Sidebar navigation
 if "page" not in st.session_state:
-    st.session_state.page = menu_options[0]
-
-with st.sidebar:
-    st.image("momly_avatar.png", width=160)  # optional logo
-    selected_page = st.radio("NAVIGATE", menu_options, index=menu_options.index(st.session_state.page))
-    st.session_state.page = selected_page
+    st.session_state.page = "🏠 Home"
+   
+st.session_state.page = st.sidebar.radio(
+    "Navigate",
+    ["🏠 Home", "📝 Take Test", "📊 Result Explanation", "📬 Feedback", "🧰 Resources"],
+    index=["🏠 Home", "📝 Take Test", "📊 Result Explanation", "📬 Feedback", "🧰 Resources"].index(st.session_state.page),
+    key="menu"
+)
 
 menu = st.session_state.page
 
-# ---------------- HOME ---------------- #
-if menu == "HOME":
+
+# HOME
+if menu == "🏠 Home":
     st.markdown("""
-    <div style="text-align: center; padding: 60px 20px;">
-        <h1 class="home-title">POSTPARTUM DEPRESSION RISK PREDICTOR</h1>
-        <h3 class="home-subtitle">Empowering maternal health through smart technology</h3>
+    <div style="text-align: center; padding: 40px 20px;">
+        <h1 style="font-size: 3.5em; color: white;">POSTPARTUM DEPRESSION RISK PREDICTOR</h1>
+         <h3 style="font-size: 1.6em; color: white;">Empowering maternal health through smart technology</h3>
     </div>
     """, unsafe_allow_html=True)
 
-    st.markdown("<div style='text-align:center;'>", unsafe_allow_html=True)
-    st.button("START TEST", on_click=lambda: st.session_state.update({"page": "TAKE TEST"}))
-    st.markdown("</div>", unsafe_allow_html=True)
+    if st.button("📝 Start Test"):
+        st.session_state.page = "📝 Take Test"
+        st.rerun()
 
-# ---------------- TAKE TEST ---------------- #
-elif menu == "TAKE TEST":
-    st.header("QUESTIONNAIRE")
+# TEST PAGE
+elif menu == "📝 Take Test":
+    st.header("📝 Questionnaire")
 
     for var, default in {
         'question_index': 0,
