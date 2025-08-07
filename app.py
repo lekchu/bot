@@ -212,20 +212,66 @@ elif menu == "📊 Result Explanation":
 
 # FEEDBACK
 elif menu == "📬 Feedback":
-    st.header("📬 Share Feedback")
-    name = st.text_input("Your Name")
-    message = st.text_area("Your Feedback")
-    if st.button("Submit"):
-        st.success("Thank you for your valuable feedback! 💌")
+    st.markdown("<h2 style='color: #f06292;'>📬 Share Your Feedback</h2>", unsafe_allow_html=True)
+    st.markdown("<p style='color: #ddd;'>We value your input and would love to hear your thoughts or suggestions!</p>", unsafe_allow_html=True)
 
-# RESOURCES
+    with st.form("feedback_form", clear_on_submit=True):
+        col1, col2 = st.columns(2)
+        with col1:
+            name = st.text_input("Your Name")
+        with col2:
+            email = st.text_input("Your Email (optional)")
+
+        message = st.text_area("Your Feedback", height=150)
+
+        submitted = st.form_submit_button("✅ Submit Feedback")
+
+        if submitted:
+            st.success("Thank you for your valuable feedback! 💌")
+            st.balloons()
+
+
 elif menu == "🧰 Resources":
-    st.header("Helpful Links and Support")
-    st.markdown("""
-    - [📞 National Mental Health Helpline - 1800-599-0019](https://www.mohfw.gov.in)
-    - [🌐 WHO Maternal Mental Health](https://www.who.int/news-room/fact-sheets/detail/mental-health-of-women-during-pregnancy-and-after-childbirth)
-    - [📝 Postpartum Support International](https://www.postpartum.net/)
-    """)
+    st.markdown("<h2 style='color: #f06292;'>🧰 Helpful Links and Support</h2>", unsafe_allow_html=True)
+    st.markdown("<p style='color: #ccc;'>Here are some trusted resources for maternal mental health support and crisis assistance.</p>", unsafe_allow_html=True)
+
+    resources = [
+        {
+            "name": "📞 National Mental Health Helpline",
+            "link": "https://www.mohfw.gov.in",
+            "desc": "24x7 toll-free helpline – 1800-599-0019"
+        },
+        {
+            "name": "🌐 WHO Maternal Mental Health",
+            "link": "https://www.who.int/news-room/fact-sheets/detail/mental-health-of-women-during-pregnancy-and-after-childbirth",
+            "desc": "Facts and global insights on maternal mental health."
+        },
+        {
+            "name": "📝 Postpartum Support International",
+            "link": "https://www.postpartum.net/",
+            "desc": "Worldwide support groups and educational resources."
+        },
+        {
+            "name": "📚 EPDS Scale Guide",
+            "link": "https://www.fresno.ucsf.edu/pediatrics/downloads/edinburghscale.pdf",
+            "desc": "Official Edinburgh Postnatal Depression Scale PDF."
+        }
+    ]
+
+    for res in resources:
+        st.markdown(f"""
+            <div style="background: #333; border-radius: 10px; padding: 15px; margin-bottom: 15px;">
+                <h4 style="margin-bottom: 5px;">{res['name']}</h4>
+                <p style="color: #bbb;">{res['desc']}</p>
+                <a href="{res['link']}" target="_blank" style="color: #f06292; text-decoration: none;">🔗 Visit Site</a>
+            </div>
+        """, unsafe_allow_html=True)
+st.markdown("""
+    <div style="background-color: #ffcccb; color: #222; padding: 10px; border-radius: 8px; text-align: center;">
+        If you or someone you know is in crisis, don’t wait — reach out for help now.
+    </div>
+""", unsafe_allow_html=True)
+
 
 import streamlit as st
 from PIL import Image
