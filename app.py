@@ -262,6 +262,13 @@ def show_avatar_button():
 
     avatar_col1, avatar_col2, avatar_col3 = st.columns([8, 1, 1])
     with avatar_col3:
+        if st.button("💬 Hi, I'm MOMLY", help="Click to chat with MOMLY"):
+            st.session_state.show_chat = not st.session_state.show_chat
+
+    st.markdown("</div>", unsafe_allow_html=True)
+
+    avatar_col1, avatar_col2, avatar_col3 = st.columns([8, 1, 1])
+    with avatar_col3:
         if st.button("💬", help="Click to chat with MOMLY"):
             st.session_state.show_chat = not st.session_state.show_chat
 
