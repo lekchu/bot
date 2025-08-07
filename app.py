@@ -4,8 +4,6 @@ import joblib
 import plotly.graph_objects as go
 from fpdf import FPDF
 import base64
-from PIL import Image
-from io import BytesIO
 
 # Load model and label encoder
 model = joblib.load("ppd_model_pipeline.pkl")
@@ -14,7 +12,7 @@ le = joblib.load("label_encoder.pkl")
 # Page config
 st.set_page_config(page_title="PPD Risk Predictor", page_icon="🧠", layout="wide")
 
-# Background animation for app
+# Blue background animation
 def add_page_animation():
     st.markdown("""
     <style>
@@ -32,18 +30,7 @@ def add_page_animation():
 
 add_page_animation()
 
-# Sidebar background image
-st.markdown("""
-    <style>
-    [data-testid="stSidebar"] {
-        background-image: url('background.png');
-        background-size: cover;
-        background-position: center;
-    }
-    </style>
-""", unsafe_allow_html=True)
-
-# Session state initialization for navigation
+# Sidebar navigation
 if "page" not in st.session_state:
     st.session_state.page = "🏠 Home"
 
@@ -56,54 +43,7 @@ st.session_state.page = st.sidebar.radio(
 
 menu = st.session_state.page
 
-# Show chatbot emoji with animated text
-def show_avatar_button():
-    st.markdown("""
-        <style>
-        @keyframes fadeInUp {
-            0% {opacity: 0; transform: translateY(10px);}
-            100% {opacity: 1; transform: translateY(0);}
-        }
-
-        .avatar-container {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 9999;
-            text-align: center;
-            animation: fadeInUp 1s ease-out;
-        }
-
-        .chat-text {
-            font-size: 14px;
-            color: #fff;
-            background: #f06292;
-            padding: 4px 10px;
-            border-radius: 20px;
-            margin-bottom: 5px;
-            display: inline-block;
-            animation: fadeInUp 2s ease-out;
-        }
-
-        .chat-button {
-            font-size: 24px;
-        }
-        </style>
-        <div class="avatar-container">
-            <div class="chat-text">👋 Hi, I'm <strong>MOMLY</strong></div>
-    """, unsafe_allow_html=True)
-
-    avatar_col1, avatar_col2, avatar_col3 = st.columns([8, 1, 1])
-    with avatar_col3:
-        if st.button("💬", help="Click to chat with MOMLY"):
-            st.session_state.show_chat = not st.session_state.show_chat
-
-    st.markdown("</div>", unsafe_allow_html=True)
-
-# Display chatbot icon
-show_avatar_button()
-
-# --- SECTION 1: HOME PAGE ---
+# HOME
 if menu == "🏠 Home":
     st.markdown("""
     <div style="text-align: center; padding: 40px 20px;">
@@ -123,16 +63,6 @@ elif menu == "📝 Take Test":
     for var, default in {
         'question_index': 0,
         'responses': [],
-# Add custom background to sidebar
-st.markdown("""
-    <style>
-    [data-testid="stSidebar"] {
-        background-image: url('background.png');
-        background-size: cover;
-        background-position: center;
-    }
-    </style>
-""", unsafe_allow_html=True)
         'age': 25,
         'support': "Medium",
         'name': "",
@@ -165,123 +95,6 @@ st.markdown("""
          {"No, never": 0, "Not very often": 1, "Yes, some of the time": 2, "Yes, most of the time": 3}),
         ("I have been anxious or worried for no good reason",
          {"No, not at all": 0, "Hardly ever": 1, "Yes, sometimes": 2, "Yes, very often": 3}),
-import streamlit as st
-import pandas as pd
-import joblib
-import plotly.graph_objects as go
-from fpdf import FPDF
-import base64
-from PIL import Image
-from io import BytesIO
-
-# Load model and label encoder
-model = joblib.load("ppd_model_pipeline.pkl")
-le = joblib.load("label_encoder.pkl")
-
-# Page config
-st.set_page_config(page_title="PPD Risk Predictor", page_icon="🧠", layout="wide")
-
-# Background animation for app
-def add_page_animation():
-    st.markdown("""
-    <style>
-    .stApp {
-        animation: fadeBg 10s ease-in-out infinite;
-        background-color: #001f3f;
-    }
-    @keyframes fadeBg {
-        0% { background-color: #001f3f; }
-        50% { background-color: #001f3f; }
-        100% { background-color: #001f3f; }
-    }
-    </style>
-    """, unsafe_allow_html=True)
-
-add_page_animation()
-
-# Sidebar background image
-st.markdown("""
-    <style>
-    [data-testid="stSidebar"] {
-        background-image: url('background.png');
-        background-size: cover;
-        background-position: center;
-    }
-    </style>
-""", unsafe_allow_html=True)
-
-# Session state initialization for navigation
-if "page" not in st.session_state:
-    st.session_state.page = "🏠 Home"
-
-st.session_state.page = st.sidebar.radio(
-    "Navigate",
-    ["🏠 Home", "📝 Take Test", "📊 Result Explanation", "📬 Feedback", "🧰 Resources"],
-    index=["🏠 Home", "📝 Take Test", "📊 Result Explanation", "📬 Feedback", "🧰 Resources"].index(st.session_state.page),
-    key="menu"
-)
-
-menu = st.session_state.page
-
-# Show chatbot emoji with animated text
-def show_avatar_button():
-    st.markdown("""
-        <style>
-        @keyframes fadeInUp {
-            0% {opacity: 0; transform: translateY(10px);}
-            100% {opacity: 1; transform: translateY(0);}
-        }
-
-        .avatar-container {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 9999;
-            text-align: center;
-            animation: fadeInUp 1s ease-out;
-        }
-
-        .chat-text {
-            font-size: 14px;
-            color: #fff;
-            background: #f06292;
-            padding: 4px 10px;
-            border-radius: 20px;
-            margin-bottom: 5px;
-            display: inline-block;
-            animation: fadeInUp 2s ease-out;
-        }
-
-        .chat-button {
-            font-size: 24px;
-        }
-        </style>
-        <div class="avatar-container">
-            <div class="chat-text">👋 Hi, I'm <strong>MOMLY</strong></div>
-    """, unsafe_allow_html=True)
-
-    avatar_col1, avatar_col2, avatar_col3 = st.columns([8, 1, 1])
-    with avatar_col3:
-        if st.button("💬", help="Click to chat with MOMLY"):
-            st.session_state.show_chat = not st.session_state.show_chat
-
-    st.markdown("</div>", unsafe_allow_html=True)
-
-# Display chatbot icon
-show_avatar_button()
-
-# --- SECTION 1: HOME PAGE ---
-if menu == "🏠 Home":
-    st.markdown("""
-    <div style="text-align: center; padding: 40px 20px;">
-        <h1 style="font-size: 3.5em; color: white;">POSTPARTUM DEPRESSION RISK PREDICTOR</h1>
-         <h3 style="font-size: 1.6em; color: white;">Empowering maternal health through smart technology</h3>
-    </div>
-    """, unsafe_allow_html=True)
-
-    if st.button("📝 Start Test"):
-        st.session_state.page = "📝 Take Test"
-        st.rerun()
         ("I have felt scared or panicky for no very good reason",
          {"No, not at all": 0, "No, not much": 1, "Yes, sometimes": 2, "Yes, quite a lot": 3}),
         ("Things have been getting on top of me",
@@ -413,6 +226,7 @@ elif menu == "🧰 Resources":
     - [🌐 WHO Maternal Mental Health](https://www.who.int/news-room/fact-sheets/detail/mental-health-of-women-during-pregnancy-and-after-childbirth)
     - [📝 Postpartum Support International](https://www.postpartum.net/)
     """)
+
 import streamlit as st
 from PIL import Image
 import base64
@@ -431,39 +245,21 @@ def get_base64_avatar(image_path):
     return b64_data
 
 def show_avatar_button():
+    avatar_img = Image.open("momly_avatar.png")
+    buffered = BytesIO()
+    avatar_img.save(buffered, format="PNG")
+    img_bytes = buffered.getvalue()
+
     st.markdown("""
         <style>
-        @keyframes fadeInUp {
-            0% {opacity: 0; transform: translateY(10px);}
-            100% {opacity: 1; transform: translateY(0);}
-        }
-
         .avatar-container {
             position: fixed;
             bottom: 20px;
             right: 20px;
             z-index: 9999;
-            text-align: center;
-            animation: fadeInUp 1s ease-out;
-        }
-
-        .chat-text {
-            font-size: 14px;
-            color: #fff;
-            background: #f06292;
-            padding: 4px 10px;
-            border-radius: 20px;
-            margin-bottom: 5px;
-            display: inline-block;
-            animation: fadeInUp 2s ease-out;
-        }
-
-        .chat-button {
-            font-size: 24px;
         }
         </style>
         <div class="avatar-container">
-            <div class="chat-text">👋 Hi, I'm <strong>MOMLY</strong></div>
         """, unsafe_allow_html=True)
 
     avatar_col1, avatar_col2, avatar_col3 = st.columns([8, 1, 1])
@@ -643,10 +439,11 @@ if st.session_state['show_chat']:
                 st.warning("Please select a feeling.")
 
         st.button("🔄 Reset Chat", on_click=lambda: st.session_state.update({'show_chat': False, 'feeling': None}))
+
 # --- Footer ---
 st.markdown("""
     <hr style="border: 1px solid #ccc;">
     <div style="text-align: center; padding: 10px 0; color: #aaa; font-size: 0.9em;">
-        © 2025 MOMLY | Empowering Maternal Wellbeing 💖
+        © 2025 MOMLY | Empowering Maternal Wellbeing 
     </div>
 """, unsafe_allow_html=True)
