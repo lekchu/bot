@@ -245,21 +245,39 @@ def get_base64_avatar(image_path):
     return b64_data
 
 def show_avatar_button():
-    avatar_img = Image.open("momly_avatar.png")
-    buffered = BytesIO()
-    avatar_img.save(buffered, format="PNG")
-    img_bytes = buffered.getvalue()
-
     st.markdown("""
         <style>
+        @keyframes fadeInUp {
+            0% {opacity: 0; transform: translateY(10px);}
+            100% {opacity: 1; transform: translateY(0);}
+        }
+
         .avatar-container {
             position: fixed;
             bottom: 20px;
             right: 20px;
             z-index: 9999;
+            text-align: center;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .chat-text {
+            font-size: 14px;
+            color: #fff;
+            background: #f06292;
+            padding: 4px 10px;
+            border-radius: 20px;
+            margin-bottom: 5px;
+            display: inline-block;
+            animation: fadeInUp 2s ease-out;
+        }
+
+        .chat-button {
+            font-size: 24px;
         }
         </style>
         <div class="avatar-container">
+            <div class="chat-text">👋 Hi, I'm <strong>MOMLY</strong></div>
         """, unsafe_allow_html=True)
 
     avatar_col1, avatar_col2, avatar_col3 = st.columns([8, 1, 1])
