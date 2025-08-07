@@ -89,11 +89,12 @@ except FileNotFoundError:
 
 
 # --- Sidebar navigation ---
-if "page" not in st.session_state:
+nav_options = ["HOME", "TAKE TEST", "RESULT EXPLANATION", "FEEDBACK", "🧰 RESOURCES"]
+
+# Corrected logic to prevent ValueError
+if "page" not in st.session_state or st.session_state.page not in nav_options:
     st.session_state.page = "HOME"
 
-# Updated navigation options with capitalization and a new emoji for Resources
-nav_options = ["HOME", "TAKE TEST", "RESULT EXPLANATION", "FEEDBACK", "🧰 RESOURCES"]
 st.session_state.page = st.sidebar.radio(
     "Navigate",
     nav_options,
@@ -332,11 +333,6 @@ if 'show_momly_details' not in st.session_state:
 
 
 # --- Load avatar image ---
-def get_base64_avatar(image_path):
-    with open(image_path, "rb") as img_file:
-        b64_data = base64.b64encode(img_file.read()).decode()
-    return b64_data
-
 def show_avatar_button():
     try:
         avatar_img = Image.open("momly_avatar.png")
