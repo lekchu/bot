@@ -226,9 +226,7 @@ elif menu == "🧰 Resources":
     - [🌐 WHO Maternal Mental Health](https://www.who.int/news-room/fact-sheets/detail/mental-health-of-women-during-pregnancy-and-after-childbirth)
     - [📝 Postpartum Support International](https://www.postpartum.net/)
     """)
-if "momly_visible" not in st.session_state:
-  st.session_state.momly_visible = False
-import streamlit as st
+
 from PIL import Image
 import base64
 from io import BytesIO
