@@ -1,12 +1,43 @@
-import streamlit as st
+
+           import streamlit as st
 import pandas as pd
 import joblib
 import plotly.graph_objects as go
 from fpdf import FPDF
 import base64
+from PIL import Image
+from io import BytesIO
+
+# --- ADDED: Base64 functions for background image ---
+def get_base64_of_bin_file(bin_file):
+    with open(bin_file, 'rb') as f:
+        data = f.read()
+    return base64.b64encode(data).decode()
+
+def set_png_as_page_bg(png_file):
+    bin_str = get_base64_of_bin_file(png_file)
+    page_bg_img = f'''
+    <style>
+    .stApp {{
+    background-image: url("data:image/png;base64,{bin_str}");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    }}
+    </style>
+    '''
+    st.markdown(page_bg_img, unsafe_allow_html=True)
+# --- END ADDED CODE ---
 
 # Set page config FIRST
 st.set_page_config(page_title="PPD Risk Predictor", page_icon="🧠", layout="wide")
+
+# --- ADDED: Set the background image ---
+set_png_as_page_bg('background.png')
+# --- END ADDED CODE ---
+
+# --- MODIFIED: Removed the old background CSS and the animation function to prevent conflict ---
 st.markdown("""
     <style>
     [data-testid="stSidebar"] {
@@ -17,9 +48,9 @@ st.markdown("""
     }
 
     /* Optional: add semi-transparent background to the menu text for readability */
-    [data-testid="stSidebar"] .css-ng1t4o,  /* Container */
-    [data-testid="stSidebar"] .css-1v3fvcr { /* Menu radio */
-        background-color: rgba(0, 0, 0, 0.4); 
+    [data-testid="stSidebar"] .css-ng1t4o,
+    [data-testid="stSidebar"] .css-1v3fvcr {
+        background-color: rgba(0, 0, 0, 0.4);
         padding: 10px;
         border-radius: 10px;
     }
@@ -30,38 +61,16 @@ st.markdown("""
     }
     </style>
 """, unsafe_allow_html=True)
-
+# --- END MODIFIED CODE ---
 
 # Load model and label encoder
 model = joblib.load("ppd_model_pipeline.pkl")
 le = joblib.load("label_encoder.pkl")
 
-# Set animated background with image
-def add_page_animation():
-    st.markdown("""
-    <style>
-    .stApp {
-        animation: fadeBg 20s ease-in-out infinite;
-        background-image: url("background.png");
-        background-size: cover;
-        background-position: center;
-        background-attachment: fixed;
-        background-repeat: no-repeat;
-    }
-    @keyframes fadeBg {
-        0% { filter: brightness(1); }
-        50% { filter: brightness(1.05); }
-        100% { filter: brightness(1); }
-    }
-    </style>
-    """, unsafe_allow_html=True)
-
-add_page_animation()
-
 # Sidebar navigation
 if "page" not in st.session_state:
     st.session_state.page = "🏠 Home"
-   
+
 st.session_state.page = st.sidebar.radio(
     "Navigate",
     ["🏠 Home", "📝 Take Test", "📊 Result Explanation", "📬 Feedback", "🧰 Resources"],
@@ -70,7 +79,6 @@ st.session_state.page = st.sidebar.radio(
 )
 
 menu = st.session_state.page
-
 
 # HOME
 if menu == "🏠 Home":
@@ -233,9 +241,9 @@ elif menu == "📊 Result Explanation":
     st.markdown("""
     | Risk Level | Meaning |
     |------------|---------|
-    | **Mild (0)**     | Normal ups and downs |
+    | **Mild (0)** | Normal ups and downs |
     | **Moderate (1)** | Requires monitoring |
-    | **Severe (2)**   | Suggests possible clinical depression |
+    | **Severe (2)** | Suggests possible clinical depression |
     | **Profound (3)** | Needs professional help urgently |
     """)
 
@@ -258,7 +266,6 @@ elif menu == "📬 Feedback":
         if submitted:
             st.success("Thank you for your valuable feedback! 💌")
             st.balloons()
-
 
 elif menu == "🧰 Resources":
     st.markdown("<h2 style='color: #f06292;'>🧰 Helpful Links and Support</h2>", unsafe_allow_html=True)
@@ -295,12 +302,6 @@ elif menu == "🧰 Resources":
                 <a href="{res['link']}" target="_blank" style="color: #f06292; text-decoration: none;">🔗 Visit Site</a>
             </div>
         """, unsafe_allow_html=True)
-
-
-import streamlit as st
-from PIL import Image
-import base64
-from io import BytesIO
 
 # --- Session State Initialization ---
 if 'show_chat' not in st.session_state:
@@ -512,8 +513,7 @@ if st.session_state['show_chat']:
 
 # --- Footer ---
 st.markdown("""
-
     <div style="text-align: center; padding: 10px 0; color: #aaa; font-size: 0.9em;">
-        © 2025 MOMLY | Empowering Maternal Wellbeing 
+        © 2025 MOMLY | Empowering Maternal Wellbeing
     </div>
 """, unsafe_allow_html=True)
