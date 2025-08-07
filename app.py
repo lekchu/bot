@@ -143,7 +143,7 @@ with st.sidebar:
     st.session_state.page = st.radio(
         "Navigate",
             ["HOME", "TAKE TEST", "RESULT EXPLANATION", "FEEDBACK", "RESOURCES"],
-        index=["HOME", "TAKE TEST", "RESULT EXPLANATION", "FEEDBACK", "RESOURCES"].index(st.session_state.page),
+            index=["HOME", "TAKE TEST", "RESULT EXPLANATION", "FEEDBACK", "RESOURCES"].index(st.session_state.page),
         key="menu"
     )
 
