@@ -11,19 +11,6 @@ st.set_page_config(page_title="PPD Risk Predictor", page_icon="🧠", layout="wi
 # --- CSS Styling ---
 st.markdown("""
     <style>
-    /* Hide radio selector arrows (navigation bullets) */
-[data-testid="stSidebar"] .stRadio > div {
-    gap: 0px !important;
-}
-
-[data-testid="stSidebar"] .stRadio div[role="radiogroup"] > label::before {
-    display: none;
-}
-
-[data-testid="stSidebar"] .stRadio div[role="radiogroup"] > label {
-    padding-left: 10px;
-}
-
     /* Main page background with fade animation */
     .stApp {
         animation: fadeBg 20s ease-in-out infinite;
