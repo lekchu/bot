@@ -228,7 +228,8 @@ elif menu == "🧰 Resources":
     """)
 if "momly_visible" not in st.session_state:
   st.session_state.momly_visible = False
-    import streamlit as st
+    
+import streamlit as st
 from PIL import Image
 
 # Set page config
