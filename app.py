@@ -230,127 +230,224 @@ if "momly_visible" not in st.session_state:
   st.session_state.momly_visible = False
 import streamlit as st
 from PIL import Image
-import os
+import base64
+from io import BytesIO
 
-# Define feelings
-feelings_data = {
-    "Sad": {
-        "tips": [
-            "Take a short walk in fresh air.",
-            "Write 3 things you're grateful for.",
-            "Talk to a friend or family member.",
-            "Listen to your favorite calming music.",
-            "Practice deep breathing for 3 minutes.",
-            "Drink a warm cup of tea.",
-            "Give yourself permission to rest."
-        ],
-        "video": "https://www.youtube.com/watch?v=ZToicYcHIOU"  # Guided meditation
-    },
-    "Tired": {
-        "tips": [
-            "Try a power nap (10–20 mins).",
-            "Stretch your body gently.",
-            "Limit screen time for a while.",
-            "Hydrate with water or herbal tea.",
-            "Breathe deeply for 5 minutes.",
-            "Give yourself rest without guilt.",
-            "Listen to relaxing sleep sounds."
-        ],
-        "video": "https://www.youtube.com/watch?v=1vx8iUvfyCY"
-    },
-    "Anxious": {
-        "tips": [
-            "Do a 4-7-8 breathing exercise.",
-            "Write down what worries you.",
-            "Focus on things around you (5 senses).",
-            "Repeat a calming affirmation.",
-            "Move your body lightly.",
-            "Pause and listen to calming music.",
-            "Avoid caffeine for a while."
-        ],
-        "video": "https://www.youtube.com/watch?v=MIr3RsUWrdo"
-    },
-    "Lonely": {
-        "tips": [
-            "Send a message to someone you miss.",
-            "Join an online community group.",
-            "Go for a short walk outside.",
-            "Write in a journal about how you feel.",
-            "Read a comforting book or poem.",
-            "Remind yourself: you’re not alone.",
-            "Watch something uplifting."
-        ],
-        "video": "https://www.youtube.com/watch?v=WVz8ygN0JDk"
-    },
-    "Angry": {
-        "tips": [
-            "Pause. Take deep breaths before reacting.",
-            "Step away from the situation briefly.",
-            "Punch a pillow or squeeze a stress ball.",
-            "Journal your emotions.",
-            "Talk it out with someone safe.",
-            "Listen to calming music.",
-            "Do something active to release tension."
-        ],
-        "video": "https://www.youtube.com/watch?v=DbO3e4EDsT8"
-    },
-    "Overwhelmed": {
-        "tips": [
-            "Write down your top 3 priorities.",
-            "Break tasks into smaller steps.",
-            "Ask for help or delegate something.",
-            "Do one thing at a time.",
-            "Breathe: inhale for 4, exhale for 6.",
-            "Take a 10-minute break.",
-            "Remind yourself you’re doing enough."
-        ],
-        "video": "https://www.youtube.com/watch?v=hnpQrMqDoqE"
-    }
-}
+# Initialize session states
+if 'show_chat' not in st.session_state:
+    st.session_state.show_chat = False
+if 'feeling' not in st.session_state:
+    st.session_state.feeling = None
 
-# App title
-st.markdown("### Hi, I'm **MOMLY!** How are you feeling today?")
+# Load avatar
+def get_base64_avatar(image_path):
+    with open(image_path, "rb") as img_file:
+        b64_data = base64.b64encode(img_file.read()).decode()
+    return b64_data
 
-# Mood selection
-selected_feeling = st.radio(
-    "", list(feelings_data.keys()), horizontal=True
-)
+avatar_b64 = get_base64_avatar("momly_avatar.png")
 
-if selected_feeling:
-    st.success(f"Here's something for when you're feeling **{selected_feeling}**:")
-    for i, tip in enumerate(feelings_data[selected_feeling]["tips"], 1):
-        st.markdown(f"**Tip {i}:** {tip}")
-    st.video(feelings_data[selected_feeling]["video"])
-
-# Avatar click shows/hides chat
-with st.sidebar:
-    if os.path.exists("momly_avatar.png"):
-        if st.button("💬 Chat with MOMLY"):
-            st.session_state.show_chat = not st.session_state.get("show_chat", False)
-    else:
-        st.warning("MOMLY avatar not found.")
-
-# Floating avatar (bottom right)
-if os.path.exists("momly_avatar.png"):
-    avatar = Image.open("momly_avatar.png")
-    st.markdown(
-        f"""
-        <style>
-        .chat-avatar {{
+# CSS for fixed avatar button
+st.markdown(f"""
+    <style>
+        .chatbot-avatar {{
             position: fixed;
-            bottom: 25px;
-            right: 25px;
+            bottom: 20px;
+            right: 20px;
             z-index: 100;
         }}
-        </style>
-        <div class="chat-avatar">
-            <a href="#momly-chat">
-                <img src="https://raw.githubusercontent.com/lekchu/bot/main/momly_avatar.png" width="70">
-            </a>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+    </style>
+    <div class="chatbot-avatar">
+        <form action="" method="post">
+            <button name="avatar_button" type="submit" style="border:none; background:none;">
+                <img src="data:image/png;base64,{avatar_b64}" width="60">
+            </button>
+        </form>
+""", unsafe_allow_html=True)
+
+# Detect avatar click
+if "avatar_button" in st.experimental_get_query_params():
+    st.session_state.show_chat = not st.session_state.show_chat
+
+# MOMLY comfort content
+momly_support = {
+    "Sad": {
+        "message": "I'm here with you. It's okay to feel sad.",
+        "tips": [
+            "Take a deep breath and rest.",
+            "Call someone you trust.",
+            "Write down how you feel.",
+            "Watch something that makes you smile.",
+            "Go for a short walk.",
+            "Drink a glass of water slowly.",
+            "Listen to calming music."
+        ],
+        "activity": [
+            "Grab paper and pen.",
+            "Write one thing you love about yourself.",
+            "Stick it somewhere visible and smile!"
+        ],
+        "video": "https://www.youtube.com/watch?v=ZToicYcHIOU",
+        "distraction": "Try watching a funny video or baking something sweet."
+    },
+    "Tired": {
+        "message": "Rest is not a luxury. It's a necessity.",
+        "tips": [
+            "Lie down for 10 mins, close your eyes.",
+            "Stretch your arms and back slowly.",
+            "Drink cool water or herbal tea.",
+            "Take a warm shower.",
+            "Say 'I’m allowed to rest' out loud.",
+            "Turn off unnecessary lights.",
+            "Listen to soft nature sounds."
+        ],
+        "activity": [
+            "Set a timer for 15 minutes.",
+            "Lie flat, place a cool cloth on your eyes.",
+            "Breathe deeply until timer ends."
+        ],
+        "video": "https://www.youtube.com/watch?v=ZBnPlqQFPKs",
+        "distraction": "Read a short poem or doodle aimlessly."
+    },
+        "Anxious": {
+        "message": "You're not alone. Anxiety comes and goes — let's manage it together.",
+        "tips": [
+            "Try the 5-4-3-2-1 grounding technique.",
+            "Slowly inhale for 4 seconds, hold, exhale.",
+            "Move your body—stretch or shake out your hands.",
+            "Limit news and social media intake today.",
+            "Talk to someone about your worry.",
+            "Listen to calming music or white noise.",
+            "Say, 'This feeling is temporary.'"
+        ],
+        "activity": [
+            "Sit still and name 5 things you see.",
+            "Name 4 things you can touch.",
+            "Name 3 things you can hear.",
+            "Name 2 things you can smell.",
+            "Name 1 thing you can taste."
+        ],
+        "video": "https://www.youtube.com/watch?v=MIr3RsUWrdo",
+        "distraction": "Try coloring a mandala or sorting old photos."
+    },
+
+    "Overwhelmed": {
+        "message": "One moment at a time. You don’t have to do it all right now.",
+        "tips": [
+            "Write down just 3 small tasks.",
+            "Prioritize one thing — ignore the rest for now.",
+            "Take a 5-minute breathing break.",
+            "Say 'It’s okay not to finish everything.'",
+            "Put on calming background music.",
+            "Ask for help, even if it’s small.",
+            "Sit in silence for 2 minutes."
+        ],
+        "activity": [
+            "Set a 10-min timer.",
+            "Do a single task (e.g., fold 3 clothes).",
+            "Celebrate yourself after you finish!"
+        ],
+        "video": "https://www.youtube.com/watch?v=hnpQrMqDoqE",
+        "distraction": "Play a simple game on your phone or water your plants."
+    },
+
+    "Lonely": {
+        "message": "You are deeply loved, even when it doesn’t feel like it.",
+        "tips": [
+            "Send a text to a friend or family.",
+            "Write a letter to your future self.",
+            "Pet a cat or dog (or watch a video).",
+            "Remind yourself: 'I am not invisible.'",
+            "Join an online support group.",
+            "Listen to a podcast about healing.",
+            "Say out loud: 'I matter.'"
+        ],
+        "activity": [
+            "Write down 3 people who care about you.",
+            "List 3 things you enjoy doing.",
+            "Do one small kind thing for yourself."
+        ],
+        "video": "https://www.youtube.com/watch?v=2ZIpFytCSVc",
+        "distraction": "Try journaling or creating a vision board on your phone."
+    },
+
+    "Angry": {
+        "message": "Anger is valid. Let’s express it in a healthy way.",
+        "tips": [
+            "Take 5 deep breaths in and out.",
+            "Squeeze a pillow or stress ball.",
+            "Write a letter (you don’t have to send it).",
+            "Splash cold water on your face.",
+            "Go for a power walk.",
+            "Punch a cushion (safely!).",
+            "Say: 'I’m allowed to feel this.'"
+        ],
+        "activity": [
+            "Put on music and dance hard for 3 mins.",
+            "Yell into a pillow safely.",
+            "Do 10 jumping jacks and rest."
+        ],
+        "video": "https://www.youtube.com/watch?v=VLPP3XmYxXg",
+        "distraction": "Watch a comedy clip or sketch something messy."
+    },
+
+    "Lost": {
+        "message": "Even when you feel lost, you're still moving forward.",
+        "tips": [
+            "Pause. Sit somewhere quiet.",
+            "Ask yourself: 'What do I need right now?'",
+            "Journal one sentence of what you’re feeling.",
+            "Go outside and feel the air on your face.",
+            "Read an inspiring quote.",
+            "Say: 'I won’t feel this way forever.'",
+            "Remind yourself of a past victory."
+        ],
+        "activity": [
+            "Light a candle or turn on a soft light.",
+            "Write one thing you're grateful for.",
+            "Look in the mirror and smile — even just a little."
+        ],
+        "video": "https://www.youtube.com/watch?v=UNcZp3QGgRc",
+        "distraction": "Organize a drawer or create a small playlist of songs you love."
+    }
+
+    # Add 5 more feelings below similarly
+}
+
+# Show chatbot only if toggled
+if st.session_state.show_chat:
+    with st.expander("💬 MOMLY is here for you", expanded=True):
+        st.write("Hi! I'm MOMLY, your support buddy. How are you feeling today?")
+        feeling = st.radio(
+            "Choose your feeling:",
+            list(momly_support.keys()),
+            horizontal=True,
+            key="feeling_radio"
+        )
+
+        if st.button("🎗️ Get Comforting Tips"):
+            if feeling in momly_support:
+                content = momly_support[feeling]
+                st.success(content["message"])
+
+                st.subheader("🌱 Tips")
+                for i, tip in enumerate(content["tips"], 1):
+                    st.markdown(f"- **Tip {i}:** {tip}")
+
+                st.subheader("🧩 Try This Activity")
+                for step in content["activity"]:
+                    st.markdown(f"🔹 {step}")
+
+                st.subheader("🎥 Recommended Video")
+                st.video(content["video"])
+
+                st.subheader("🎯 Mind Distraction")
+                st.info(content["distraction"])
+            else:
+                st.warning("Please select a feeling.")
+
+        st.button("🔄 Reset Chat", on_click=lambda: st.session_state.update({'show_chat': False, 'feeling': None}))
+
 
 
 # Show chatbot only when toggled
