@@ -4,6 +4,8 @@ import joblib
 import plotly.graph_objects as go
 from fpdf import FPDF
 import base64
+from PIL import Image
+from io import BytesIO
 
 # Set page config FIRST
 st.set_page_config(page_title="PPD Risk Predictor", page_icon="🧠", layout="wide")
@@ -78,6 +80,51 @@ st.markdown("""
         50%  { transform: translateY(-10px); }
         100% { transform: translateY(0px); }
     }
+
+    /* New CSS for the Start Test button background */
+    .st-emotion-cache-1px00h4 button {
+        background-color: #f06292; /* A vibrant pink background */
+        color: white;
+        font-weight: bold;
+        padding: 15px 30px;
+        border-radius: 10px;
+        border: none;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+    }
+
+    .st-emotion-cache-1px00h4 button:hover {
+        background-color: #e91e63; /* Darker pink on hover */
+        transform: translateY(-2px);
+        box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    /* MOMLY chat button styling */
+    .avatar-container {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 9999;
+    }
+
+    .avatar-container button {
+        background-color: #f06292;
+        color: white;
+        font-size: 1.5rem;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        border: none;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+    }
+
+    .avatar-container button:hover {
+        background-color: #e91e63;
+        transform: scale(1.1);
+        box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3);
+    }
+    
     </style>
 
     <div class="floating-heart">💗</div>
@@ -111,21 +158,10 @@ if menu == "🏠 Home":
     </div>
     """, unsafe_allow_html=True)
 
+    # Wrap the button in a div to add a background to it.
     st.markdown("<div style='text-align:center;'>", unsafe_allow_html=True)
     st.button("📝 Start Test", on_click=lambda: st.session_state.update({"page": "📝 Take Test"}))
     st.markdown("</div>", unsafe_allow_html=True)
-
-# You can paste your existing “Take Test”, “Result Explanation”, “Feedback”, and “Resources” pages below this point
-# (unchanged from your earlier code)
-
-# ✅ Let me know if you'd like me to help integrate:
-# - The full questionnaire
-# - Chatbot
-# - Custom PDF styling
-# - Navigation animation or hover effects
-
-
-
 
 # TEST PAGE
 elif menu == "📝 Take Test":
