@@ -6,4 +6,4 @@ fpdf
 streamlit_chat
 openai
 scikit-learn==1.4.2
-numpy==1.26.4
+
