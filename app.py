@@ -1,81 +1,61 @@
-# app.py - Enhanced with Sidebar Background and Improved Navigation
-
 import streamlit as st
 import pandas as pd
 import joblib
 import plotly.graph_objects as go
 from fpdf import FPDF
 import base64
-import os
-from PIL import Image
-from io import BytesIO
 
-# --- Sidebar Background Image ---
-def apply_sidebar_background():
-    image_path = "static/sidebar_bg.png"
-    if os.path.exists(image_path):
-        with open(image_path, "rb") as img_file:
-            b64_image = base64.b64encode(img_file.read()).decode()
-        st.markdown(f"""
-        <style>
-        [data-testid="stSidebar"] > div:first-child {{
-            background-image: url("data:image/png;base64,{b64_image}");
-            background-size: cover;
-            background-position: center;
-            padding: 20px;
-            border-radius: 10px;
-            color: white;
-        }}
-        .sidebar-nav h3 {{
-            margin-bottom: 15px;
-            color: #ffcc00;
-        }}
-        .sidebar-nav .nav-item {{
-            margin: 8px 0;
-            font-size: 16px;
-            color: white;
-        }}
-        .sidebar-nav .nav-item:hover {{
-            background-color: rgba(0,0,0,0.3);
-            border-radius: 5px;
-            padding-left: 10px;
-        }}
-        </style>
-        """, unsafe_allow_html=True)
-
-# --- Render Sidebar ---
-def render_sidebar():
-    apply_sidebar_background()
-    with st.sidebar:
-        st.markdown('<div class="sidebar-nav">', unsafe_allow_html=True)
-        st.markdown("### 🧠 MOMLY Navigation", unsafe_allow_html=True)
-        menu = st.radio("",
-            ["🏠 Home", "📝 Take Test", "📊 Result Explanation", "📬 Feedback", "🧰 Resources"],
-            key="menu")
-        st.markdown("</div>", unsafe_allow_html=True)
-    return menu
-
-# --- Set Page Config ---
-st.set_page_config(page_title="PPD Risk Predictor", page_icon="🧠", layout="wide")
-
-# --- Load model and encoder ---
+# Load model and label encoder
 model = joblib.load("ppd_model_pipeline.pkl")
 le = joblib.load("label_encoder.pkl")
 
-# --- Navigation ---
-menu = render_sidebar()
+# Page config
+st.set_page_config(page_title="PPD Risk Predictor", page_icon="🧠", layout="wide")
 
-# You can now continue with the rest of your logic like:
+# Blue background animation
+def add_page_animation():
+    st.markdown("""
+    <style>
+    .stApp {
+        animation: fadeBg 10s ease-in-out infinite;
+        background-color: #001f3f;
+    }
+    @keyframes fadeBg {
+        0% { background-color: #001f3f; }
+        50% { background-color: #001f3f; }
+        100% { background-color: #001f3f; }
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+add_page_animation()
+
+# Sidebar navigation
+if "page" not in st.session_state:
+    st.session_state.page = "🏠 Home"
+
+st.session_state.page = st.sidebar.radio(
+    "Navigate",
+    ["🏠 Home", "📝 Take Test", "📊 Result Explanation", "📬 Feedback", "🧰 Resources"],
+    index=["🏠 Home", "📝 Take Test", "📊 Result Explanation", "📬 Feedback", "🧰 Resources"].index(st.session_state.page),
+    key="menu"
+)
+
+menu = st.session_state.page
+
+# HOME
 if menu == "🏠 Home":
-    st.title("Welcome to the Postpartum Depression Risk Predictor")
-    st.write("This tool helps assess postpartum depression risk using the EPDS scale.")
-    if st.button("Start Test"):
+    st.markdown("""
+    <div style="text-align: center; padding: 40px 20px;">
+        <h1 style="font-size: 3.5em; color: white;">POSTPARTUM DEPRESSION RISK PREDICTOR</h1>
+         <h3 style="font-size: 1.6em; color: white;">Empowering maternal health through smart technology</h3>
+    </div>
+    """, unsafe_allow_html=True)
+
+    if st.button("📝 Start Test"):
         st.session_state.page = "📝 Take Test"
         st.rerun()
 
-# Continue other pages as in your app... (Take Test, Results, Feedback, Resources)
-
-# Note: Insert the rest of your existing logic for those pages below.
 
 # TEST PAGE
 elif menu == "📝 Take Test":
