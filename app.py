@@ -26,10 +26,12 @@ main_bg_b64 = get_base64_of_bin_file('background.png')
 sidebar_bg_b64 = get_base64_of_bin_file('PM.png')
 
 # --- CSS for App Background and Sidebar ---
+# Only apply CSS if both images are found
 if main_bg_b64 and sidebar_bg_b64:
     st.markdown(
         f"""
         <style>
+        /* Main app background */
         .stApp {{
             background-image: url("data:image/png;base64,{main_bg_b64}");
             background-size: cover;
@@ -38,6 +40,7 @@ if main_bg_b64 and sidebar_bg_b64:
             background-repeat: no-repeat;
         }}
 
+        /* Navigation Sidebar background */
         [data-testid="stSidebar"] {{
             background-image: url("data:image/png;base64,{sidebar_bg_b64}");
             background-size: cover;
@@ -45,6 +48,7 @@ if main_bg_b64 and sidebar_bg_b64:
             background-repeat: no-repeat;
         }}
 
+        /* Add a semi-transparent overlay to the sidebar for text readability */
         [data-testid="stSidebar"] .css-ng1t4o,
         [data-testid="stSidebar"] .css-1v3fvcr {{
             background-color: rgba(0, 0, 0, 0.4);
@@ -52,6 +56,7 @@ if main_bg_b64 and sidebar_bg_b64:
             border-radius: 10px;
         }}
 
+        /* Make navigation text white for better contrast */
         [data-testid="stSidebar"] label {{
             color: white !important;
         }}
@@ -60,6 +65,7 @@ if main_bg_b64 and sidebar_bg_b64:
         unsafe_allow_html=True
     )
 elif main_bg_b64:
+    # Fallback for main background if sidebar image is missing
     st.markdown(
         f"""
         <style>
@@ -75,7 +81,9 @@ elif main_bg_b64:
         unsafe_allow_html=True
     )
 
+
 # --- Load model and label encoder ---
+# Added error handling for model loading
 try:
     model = joblib.load("ppd_model_pipeline.pkl")
     le = joblib.load("label_encoder.pkl")
@@ -86,21 +94,21 @@ except FileNotFoundError:
 
 # --- Sidebar navigation ---
 if "page" not in st.session_state:
-    st.session_state.page = "HOME"
+    st.session_state.page = "🏠 Home"
 
-# Updated navigation options with no emojis and all caps
-nav_options = ["HOME", "TAKE TEST", "RESULT EXPLANATION", "FEEDBACK", "RESOURCES"]
+# The radio button correctly sets the state variable, which then controls the page content
 st.session_state.page = st.sidebar.radio(
     "Navigate",
-    nav_options,
-    index=nav_options.index(st.session_state.page),
+    ["🏠 Home", "📝 Take Test", "📊 Result Explanation", "📬 Feedback", "🧰 Resources"],
+    index=["🏠 Home", "📝 Take Test", "📊 Result Explanation", "📬 Feedback", "🧰 Resources"].index(st.session_state.page),
     key="menu"
 )
 
 menu = st.session_state.page
 
 # --- Page Content Logic ---
-if menu == "HOME":
+# HOME
+if menu == "🏠 Home":
     st.markdown("""
     <div style="text-align: center; padding: 40px 20px;">
         <h1 style="font-size: 3.5em; color: white;">POSTPARTUM DEPRESSION RISK PREDICTOR</h1>
@@ -108,12 +116,13 @@ if menu == "HOME":
     </div>
     """, unsafe_allow_html=True)
 
-    if st.button("START TEST"):
-        st.session_state.page = "TAKE TEST"
+    if st.button("📝 Start Test"):
+        st.session_state.page = "📝 Take Test"
         st.rerun()
 
-elif menu == "TAKE TEST":
-    st.header("QUESTIONNAIRE")
+# TEST PAGE
+elif menu == "📝 Take Test":
+    st.header("📝 Questionnaire")
 
     for var, default in {
         'question_index': 0,
@@ -227,6 +236,7 @@ elif menu == "TAKE TEST":
         st.subheader("💡 Personalized Tips")
         st.markdown(tips.get(pred_label, "Consult a professional immediately."))
 
+        # PDF report
         pdf = FPDF()
         pdf.add_page()
         pdf.set_font("Arial", size=12)
@@ -251,8 +261,9 @@ elif menu == "TAKE TEST":
                 st.session_state.pop(key, None)
             st.rerun()
 
-elif menu == "RESULT EXPLANATION":
-    st.header("UNDERSTANDING RISK LEVELS")
+# RESULT EXPLANATION
+elif menu == "📊 Result Explanation":
+    st.header("📊 Understanding Risk Levels")
     st.info("All assessments in this app are based on the EPDS (Edinburgh Postnatal Depression Scale), a trusted and validated 10-question tool used worldwide to screen for postpartum depression.")
     st.markdown("""
     | Risk Level | Meaning |
@@ -263,8 +274,9 @@ elif menu == "RESULT EXPLANATION":
     | **Profound (3)** | Needs professional help urgently |
     """)
 
-elif menu == "FEEDBACK":
-    st.markdown("<h2 style='color: #f06292;'>SHARE YOUR FEEDBACK</h2>", unsafe_allow_html=True)
+# FEEDBACK
+elif menu == "📬 Feedback":
+    st.markdown("<h2 style='color: #f06292;'>📬 Share Your Feedback</h2>", unsafe_allow_html=True)
     st.markdown("<p style='color: #ddd;'>We value your input and would love to hear your thoughts or suggestions!</p>", unsafe_allow_html=True)
 
     with st.form("feedback_form", clear_on_submit=True):
@@ -276,34 +288,34 @@ elif menu == "FEEDBACK":
 
         message = st.text_area("Your Feedback", height=150)
 
-        submitted = st.form_submit_button("SUBMIT FEEDBACK")
+        submitted = st.form_submit_button("✅ Submit Feedback")
 
         if submitted:
             st.success("Thank you for your valuable feedback! 💌")
             st.balloons()
 
-elif menu == "RESOURCES":
-    st.markdown("<h2 style='color: #f06292;'>HELPFUL LINKS AND SUPPORT</h2>", unsafe_allow_html=True)
+elif menu == "🧰 Resources":
+    st.markdown("<h2 style='color: #f06292;'>🧰 Helpful Links and Support</h2>", unsafe_allow_html=True)
     st.markdown("<p style='color: #ccc;'>Here are some trusted resources for maternal mental health support and crisis assistance.</p>", unsafe_allow_html=True)
 
     resources = [
         {
-            "name": "NATIONAL MENTAL HEALTH HELPLINE",
+            "name": "📞 National Mental Health Helpline",
             "link": "https://www.mohfw.gov.in",
             "desc": "24x7 toll-free helpline – 1800-599-0019"
         },
         {
-            "name": "WHO MATERNAL MENTAL HEALTH",
+            "name": "🌐 WHO Maternal Mental Health",
             "link": "https://www.who.int/news-room/fact-sheets/detail/mental-health-of-women-during-pregnancy-and-after-childbirth",
             "desc": "Facts and global insights on maternal mental health."
         },
         {
-            "name": "POSTPARTUM SUPPORT INTERNATIONAL",
+            "name": "📝 Postpartum Support International",
             "link": "https://www.postpartum.net/",
             "desc": "Worldwide support groups and educational resources."
         },
         {
-            "name": "EPDS SCALE GUIDE",
+            "name": "📚 EPDS Scale Guide",
             "link": "https://www.fresno.ucsf.edu/pediatrics/downloads/edinburghscale.pdf",
             "desc": "Official Edinburgh Postnatal Depression Scale PDF."
         }
@@ -318,16 +330,19 @@ elif menu == "RESOURCES":
             </div>
         """, unsafe_allow_html=True)
 
+
 # --- Session State Initialization ---
 if 'show_chat' not in st.session_state:
     st.session_state['show_chat'] = False
 if 'feeling' not in st.session_state:
     st.session_state['feeling'] = None
-if 'show_momly_details' not in st.session_state:
-    st.session_state['show_momly_details'] = False
-
 
 # --- Load avatar image ---
+def get_base64_avatar(image_path):
+    with open(image_path, "rb") as img_file:
+        b64_data = base64.b64encode(img_file.read()).decode()
+    return b64_data
+
 def show_avatar_button():
     try:
         avatar_img = Image.open("momly_avatar.png")
@@ -502,37 +517,30 @@ momly_support = {
 if st.session_state['show_chat']:
     with st.expander("💬 MOMLY is here for you", expanded=True):
         st.write("Hi! I'm MOMLY, your support buddy. How are you feeling today?")
-        
         feeling = st.radio("Choose your feeling:", list(momly_support.keys()), horizontal=True, key="feeling_radio")
 
-        if feeling:
-            content = momly_support[feeling]
-            st.success(content["message"])
+        if st.button("🎗️ Get Comforting Tips"):
+            if feeling in momly_support:
+                content = momly_support[feeling]
+                st.success(content["message"])
 
-            if st.button("🎗️ Show me what to do"):
-                st.session_state['show_momly_details'] = True
-                st.rerun()
-
-            if st.session_state['show_momly_details']:
-                st.subheader("🌱 TIPS")
+                st.subheader("🌱 Tips")
                 for i, tip in enumerate(content["tips"], 1):
                     st.markdown(f"- **Tip {i}:** {tip}")
 
-                st.subheader("🧩 TRY THIS ACTIVITY")
+                st.subheader("🧩 Try This Activity")
                 for step in content["activity"]:
                     st.markdown(f"🔹 {step}")
 
-                st.subheader("🎥 RECOMMENDED VIDEO")
+                st.subheader("🎥 Recommended Video")
                 st.video(content["video"])
 
-                st.subheader("🎯 MIND DISTRACTION")
+                st.subheader("🎯 Mind Distraction")
                 st.info(content["distraction"])
+            else:
+                st.warning("Please select a feeling.")
 
-        if st.button("🔄 Reset Chat"):
-            st.session_state['show_chat'] = False
-            st.session_state['show_momly_details'] = False
-            st.session_state.pop('feeling_radio', None)
-            st.rerun()
+        st.button("🔄 Reset Chat", on_click=lambda: st.session_state.update({'show_chat': False, 'feeling': None}))
 
 # --- Footer ---
 st.markdown("""
