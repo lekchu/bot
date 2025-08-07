@@ -7,6 +7,8 @@ import base64
 
 # Set page config FIRST
 st.set_page_config(page_title="PPD Risk Predictor", page_icon="🧠", layout="wide")
+
+# --- CSS Styling ---
 st.markdown("""
     <style>
     /* Main page background with fade animation */
@@ -35,7 +37,7 @@ st.markdown("""
         color: white;
     }
 
-    /* Navigation box styling inside sidebar */
+    /* Navigation container inside sidebar */
     [data-testid="stSidebar"] .css-ng1t4o,
     [data-testid="stSidebar"] .css-1v3fvcr {
         background-color: rgba(0, 0, 0, 0.4);
@@ -43,13 +45,12 @@ st.markdown("""
         border-radius: 10px;
     }
 
-    /* Navigation label colors */
     [data-testid="stSidebar"] label {
         color: white !important;
         font-weight: bold;
     }
 
-    /* Home text glow */
+    /* Home page headline text */
     .home-title {
         font-size: 3.5em;
         color: white;
@@ -62,50 +63,46 @@ st.markdown("""
         font-style: italic;
     }
 
+    /* Floating animated heart */
+    .floating-heart {
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        animation: floatHeart 3s ease-in-out infinite;
+        font-size: 2.5rem;
+        z-index: 9999;
+    }
+
+    @keyframes floatHeart {
+        0%   { transform: translateY(0px); }
+        50%  { transform: translateY(-10px); }
+        100% { transform: translateY(0px); }
+    }
     </style>
+
+    <div class="floating-heart">💗</div>
 """, unsafe_allow_html=True)
 
-# Load model and label encoder
+# --- Load ML Model ---
 model = joblib.load("ppd_model_pipeline.pkl")
 le = joblib.load("label_encoder.pkl")
 
-# Set animated background with image
-def add_page_animation():
-    st.markdown("""
-    <style>
-    .stApp {
-        animation: fadeBg 20s ease-in-out infinite;
-        background-image: url("background.png");
-        background-size: cover;
-        background-position: center;
-        background-attachment: fixed;
-        background-repeat: no-repeat;
-    }
-    @keyframes fadeBg {
-        0% { filter: brightness(1); }
-        50% { filter: brightness(1.05); }
-        100% { filter: brightness(1); }
-    }
-    </style>
-    """, unsafe_allow_html=True)
-
-add_page_animation()
-
-# Sidebar navigation
+# --- Sidebar Navigation ---
 if "page" not in st.session_state:
     st.session_state.page = "🏠 Home"
-   
-st.session_state.page = st.sidebar.radio(
-    "Navigate",
-    ["🏠 Home", "📝 Take Test", "📊 Result Explanation", "📬 Feedback", "🧰 Resources"],
-    index=["🏠 Home", "📝 Take Test", "📊 Result Explanation", "📬 Feedback", "🧰 Resources"].index(st.session_state.page),
-    key="menu"
-)
+
+with st.sidebar:
+    st.image("momly_avatar.png", width=160)  # Optional MOMLY logo/avatar
+    st.session_state.page = st.radio(
+        "Navigate",
+        ["🏠 Home", "📝 Take Test", "📊 Result Explanation", "📬 Feedback", "🧰 Resources"],
+        index=["🏠 Home", "📝 Take Test", "📊 Result Explanation", "📬 Feedback", "🧰 Resources"].index(st.session_state.page),
+        key="menu"
+    )
 
 menu = st.session_state.page
 
-
-# HOME
+# --- HOME PAGE ---
 if menu == "🏠 Home":
     st.markdown("""
     <div style="text-align: center; padding: 60px 20px;">
@@ -117,6 +114,17 @@ if menu == "🏠 Home":
     st.markdown("<div style='text-align:center;'>", unsafe_allow_html=True)
     st.button("📝 Start Test", on_click=lambda: st.session_state.update({"page": "📝 Take Test"}))
     st.markdown("</div>", unsafe_allow_html=True)
+
+# You can paste your existing “Take Test”, “Result Explanation”, “Feedback”, and “Resources” pages below this point
+# (unchanged from your earlier code)
+
+# ✅ Let me know if you'd like me to help integrate:
+# - The full questionnaire
+# - Chatbot
+# - Custom PDF styling
+# - Navigation animation or hover effects
+
+
 
 
 # TEST PAGE
