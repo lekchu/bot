@@ -7,7 +7,7 @@ import base64
 from PIL import Image
 from io import BytesIO
 
-# --- ADDED: Base64 functions for background image ---
+# --- Base64 functions for background image ---
 def get_base64_of_bin_file(bin_file):
     with open(bin_file, 'rb') as f:
         data = f.read()
@@ -27,16 +27,14 @@ def set_png_as_page_bg(png_file):
     </style>
     '''
     st.markdown(page_bg_img, unsafe_allow_html=True)
-# --- END ADDED CODE ---
 
 # Set page config FIRST
 st.set_page_config(page_title="PPD Risk Predictor", page_icon="🧠", layout="wide")
 
-# --- ADDED: Set the background image ---
+# --- Set the background image ---
 set_png_as_page_bg('background.png')
-# --- END ADDED CODE ---
 
-# --- MODIFIED: Removed the old background CSS and the animation function to prevent conflict ---
+# --- CSS for Sidebar and Fonts ---
 st.markdown("""
     <style>
     [data-testid="stSidebar"] {
@@ -46,7 +44,7 @@ st.markdown("""
         background-repeat: no-repeat;
     }
 
-    /* Optional: add semi-transparent background to the menu text for readability */
+    /* Add a semi-transparent overlay to the sidebar for text readability */
     [data-testid="stSidebar"] .css-ng1t4o,
     [data-testid="stSidebar"] .css-1v3fvcr {
         background-color: rgba(0, 0, 0, 0.4);
@@ -54,13 +52,12 @@ st.markdown("""
         border-radius: 10px;
     }
 
-    /* Optional: make radio text white */
+    /* Make navigation text white for better contrast */
     [data-testid="stSidebar"] label {
         color: white !important;
     }
     </style>
 """, unsafe_allow_html=True)
-# --- END MODIFIED CODE ---
 
 # Load model and label encoder
 model = joblib.load("ppd_model_pipeline.pkl")
@@ -301,6 +298,7 @@ elif menu == "🧰 Resources":
                 <a href="{res['link']}" target="_blank" style="color: #f06292; text-decoration: none;">🔗 Visit Site</a>
             </div>
         """, unsafe_allow_html=True)
+
 
 # --- Session State Initialization ---
 if 'show_chat' not in st.session_state:
