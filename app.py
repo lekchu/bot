@@ -14,7 +14,7 @@ st.markdown("""
     /* Main page background with fade animation */
     .stApp {
         animation: fadeBg 20s ease-in-out infinite;
-        background-image: url("background.png");
+        background-image: url("PM.png");
         background-size: cover;
         background-position: center;
         background-attachment: fixed;
