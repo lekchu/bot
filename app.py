@@ -27,9 +27,8 @@ st.set_page_config(page_title="PPD Risk Predictor", page_icon="🧠", layout="wi
 main_bg_b64 = get_base64_of_bin_file('background.png')
 sidebar_bg_b64 = get_base64_of_bin_file('PM.png')
 
-# --- CSS for App Background and Sidebar ---
-# Only apply CSS if images are found
-if main_bg_b64 and sidebar_bg_b64:
+# --- CSS for App Background, Sidebar, and Animations ---
+if main_bg_b64:
     st.markdown(
         f"""
         <style>
@@ -42,7 +41,7 @@ if main_bg_b64 and sidebar_bg_b64:
         }}
 
         [data-testid="stSidebar"] {{
-            background-image: url("data:image/png;base64,{sidebar_bg_b64}");
+            {"background-image: url('data:image/png;base64," + sidebar_bg_b64 + "');" if sidebar_bg_b64 else ""}
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -58,21 +57,41 @@ if main_bg_b64 and sidebar_bg_b64:
         [data-testid="stSidebar"] label {{
             color: white !important;
         }}
+
+        /* Custom CSS to center the questions and options */
+        div.centered-question {
+            text-align: center;
+        }
+        div.centered-question .stRadio > label,
+        div.centered-question .stRadio > div > label > div {{
+            justify-content: center;
+        }}
+
+        /* CSS for the animated title */
+        @keyframes neonFlicker {{
+            0%, 19.99%, 22.01%, 24.99%, 54.99%, 57.01%, 100% {{
+                text-shadow: 0 0 4px #fff, 0 0 11px #fff, 0 0 19px #fff, 0 0 40px #f06292, 0 0 80px #f06292, 0 0 90px #f06292, 0 0 100px #f06292, 0 0 150px #f06292;
+                color: #fff;
+            }}
+            20%, 22%, 25%, 55%, 57% {{
+                text-shadow: none;
+                color: #f06292;
+            }}
+        }}
+        .animated-title {{
+            animation: neonFlicker 2s infinite alternate;
+        }}
         </style>
         """,
         unsafe_allow_html=True
     )
-elif main_bg_b64:
-    # Fallback for main background if sidebar image is missing
+else:
+    # Fallback for main background if image is missing
     st.markdown(
         f"""
         <style>
         .stApp {{
-            background-image: url("data:image/png;base64,{main_bg_b64}");
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            background-repeat: no-repeat;
+            background-color: #333;
         }}
         </style>
         """,
@@ -91,7 +110,6 @@ except FileNotFoundError:
 # --- Sidebar navigation ---
 nav_options = ["HOME", "TAKE TEST", "RESULT EXPLANATION", "FEEDBACK", "RESOURCES"]
 
-# Corrected logic to prevent ValueError
 if "page" not in st.session_state or st.session_state.page not in nav_options:
     st.session_state.page = "HOME"
 
@@ -108,8 +126,8 @@ menu = st.session_state.page
 if menu == "HOME":
     st.markdown("""
     <div style="text-align: center; padding: 40px 20px;">
-        <h1 style="font-size: 3.5em; color: white;">POSTPARTUM DEPRESSION RISK PREDICTOR</h1>
-         <h3 style="font-size: 1.6em; color: white;">Empowering maternal health through smart technology</h3>
+        <h1 class="animated-title" style="font-size: 3.5em; color: white;">POSTPARTUM DEPRESSION RISK PREDICTOR</h1>
+        <h3 style="font-size: 1.6em; color: white;">Empowering maternal health through smart technology</h3>
     </div>
     """, unsafe_allow_html=True)
 
@@ -171,8 +189,14 @@ elif menu == "TAKE TEST":
     ]
 
     if 1 <= idx <= 10:
+        st.progress((idx - 1) / 10, text=f"Question {idx} of 10") # The Scaler/Progress bar
         q_text, options = q_responses[idx - 1]
+        
+        # Centering the question and options
+        st.markdown("<div class='centered-question'>", unsafe_allow_html=True)
         choice = st.radio(f"{idx}. {q_text}", list(options.keys()), key=f"q{idx}")
+        st.markdown("</div>", unsafe_allow_html=True)
+
         col1, col2 = st.columns(2)
         if col1.button("⬅️ Back") and idx > 1:
             st.session_state.question_index -= 1
@@ -184,6 +208,7 @@ elif menu == "TAKE TEST":
             st.rerun()
 
     elif idx == 11:
+        st.progress(1.0, text="Questionnaire Complete!") # The Scaler/Progress bar
         name = st.session_state.name
         place = st.session_state.place
         age = st.session_state.age
