@@ -448,7 +448,5 @@ if st.session_state.show_chat:
 
 
 
-# Show chatbot only when toggled
-if st.session_state['show_momly']:
-    show_momly_chat()
+
 
