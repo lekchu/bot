@@ -7,6 +7,30 @@ import base64
 
 # Set page config FIRST
 st.set_page_config(page_title="PPD Risk Predictor", page_icon="🧠", layout="wide")
+st.markdown("""
+    <style>
+    [data-testid="stSidebar"] {
+        background-image: url("background.png");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+
+    /* Optional: add semi-transparent background to the menu text for readability */
+    [data-testid="stSidebar"] .css-ng1t4o,  /* Container */
+    [data-testid="stSidebar"] .css-1v3fvcr { /* Menu radio */
+        background-color: rgba(0, 0, 0, 0.4); 
+        padding: 10px;
+        border-radius: 10px;
+    }
+
+    /* Optional: make radio text white */
+    [data-testid="stSidebar"] label {
+        color: white !important;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
 
 # Load model and label encoder
 model = joblib.load("ppd_model_pipeline.pkl")
@@ -37,9 +61,7 @@ add_page_animation()
 # Sidebar navigation
 if "page" not in st.session_state:
     st.session_state.page = "🏠 Home"
-    with st.sidebar:
-      st.image("background.png", width=200)  # Adjust width as needed
-
+   
 st.session_state.page = st.sidebar.radio(
     "Navigate",
     ["🏠 Home", "📝 Take Test", "📊 Result Explanation", "📬 Feedback", "🧰 Resources"],
