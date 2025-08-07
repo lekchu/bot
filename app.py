@@ -99,8 +99,8 @@ if "page" not in st.session_state:
 # The radio button correctly sets the state variable, which then controls the page content
 st.session_state.page = st.sidebar.radio(
     "Navigate",
-    ["🏠 Home", "📝 Take Test", "📊 Result Explanation", "📬 Feedback", "🧰 Resources"],
-    index=["🏠 Home", "📝 Take Test", "📊 Result Explanation", "📬 Feedback", "🧰 Resources"].index(st.session_state.page),
+    [" Home", " Take Test", " Result Explanation", " Feedback", " Resources"],
+    index=[" Home", " Take Test", " Result Explanation", " Feedback", " Resources"].index(st.session_state.page),
     key="menu"
 )
 
@@ -262,8 +262,8 @@ elif menu == "📝 Take Test":
             st.rerun()
 
 # RESULT EXPLANATION
-elif menu == "📊 Result Explanation":
-    st.header("📊 Understanding Risk Levels")
+elif menu == " Result Explanation":
+    st.header(" Understanding Risk Levels")
     st.info("All assessments in this app are based on the EPDS (Edinburgh Postnatal Depression Scale), a trusted and validated 10-question tool used worldwide to screen for postpartum depression.")
     st.markdown("""
     | Risk Level | Meaning |
@@ -275,7 +275,7 @@ elif menu == "📊 Result Explanation":
     """)
 
 # FEEDBACK
-elif menu == "📬 Feedback":
+elif menu == " Feedback":
     st.markdown("<h2 style='color: #f06292;'>📬 Share Your Feedback</h2>", unsafe_allow_html=True)
     st.markdown("<p style='color: #ddd;'>We value your input and would love to hear your thoughts or suggestions!</p>", unsafe_allow_html=True)
 
@@ -294,7 +294,7 @@ elif menu == "📬 Feedback":
             st.success("Thank you for your valuable feedback! 💌")
             st.balloons()
 
-elif menu == "🧰 Resources":
+elif menu == " Resources":
     st.markdown("<h2 style='color: #f06292;'>🧰 Helpful Links and Support</h2>", unsafe_allow_html=True)
     st.markdown("<p style='color: #ccc;'>Here are some trusted resources for maternal mental health support and crisis assistance.</p>", unsafe_allow_html=True)
 
@@ -536,7 +536,7 @@ if st.session_state['show_chat']:
                 for i, tip in enumerate(content["tips"], 1):
                     st.markdown(f"- **Tip {i}:** {tip}")
 
-                st.subheader("🧩 Try This Activity")
+                st.subheader(" Try This Activity")
                 for step in content["activity"]:
                     st.markdown(f"🔹 {step}")
 
