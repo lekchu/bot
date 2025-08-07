@@ -9,28 +9,61 @@ import base64
 st.set_page_config(page_title="PPD Risk Predictor", page_icon="🧠", layout="wide")
 st.markdown("""
     <style>
+    /* Main page background with fade animation */
+    .stApp {
+        animation: fadeBg 20s ease-in-out infinite;
+        background-image: url("background.png");
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        background-repeat: no-repeat;
+    }
+
+    @keyframes fadeBg {
+        0% { filter: brightness(1); }
+        50% { filter: brightness(1.05); }
+        100% { filter: brightness(1); }
+    }
+
+    /* Sidebar with background image */
     [data-testid="stSidebar"] {
         background-image: url("PM.png");
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
+        min-height: 100vh;
+        color: white;
     }
 
-    /* Optional: add semi-transparent background to the menu text for readability */
-    [data-testid="stSidebar"] .css-ng1t4o,  /* Container */
-    [data-testid="stSidebar"] .css-1v3fvcr { /* Menu radio */
-        background-color: rgba(0, 0, 0, 0.4); 
-        padding: 10px;
+    /* Navigation box styling inside sidebar */
+    [data-testid="stSidebar"] .css-ng1t4o,
+    [data-testid="stSidebar"] .css-1v3fvcr {
+        background-color: rgba(0, 0, 0, 0.4);
+        padding: 15px;
         border-radius: 10px;
     }
 
-    /* Optional: make radio text white */
+    /* Navigation label colors */
     [data-testid="stSidebar"] label {
         color: white !important;
+        font-weight: bold;
     }
+
+    /* Home text glow */
+    .home-title {
+        font-size: 3.5em;
+        color: white;
+        text-shadow: 0 0 10px rgba(255, 192, 203, 0.7);
+    }
+
+    .home-subtitle {
+        font-size: 1.6em;
+        color: #f8bbd0;
+        font-style: italic;
+    }
+
     </style>
 """, unsafe_allow_html=True)
-
 
 # Load model and label encoder
 model = joblib.load("ppd_model_pipeline.pkl")
