@@ -228,144 +228,65 @@ elif menu == "🧰 Resources":
     """)
 if "momly_visible" not in st.session_state:
   st.session_state.momly_visible = False
-    
-import streamlit as st
-from streamlit_extras.switch_page_button import switch_page
-import time
+    import streamlit as st
+from PIL import Image
 
-# ---------- PAGE CONFIG ---------- #
+# Set page config
 st.set_page_config(page_title="PPD Predictor", layout="wide")
 
-# ---------- STYLING ---------- #
+# Optional custom CSS for floating avatar and style
 st.markdown("""
     <style>
-    .avatar {
+    .avatar-container {
         position: fixed;
-        bottom: 20px;
-        right: 20px;
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
+        bottom: 30px;
+        right: 30px;
+        z-index: 100;
         cursor: pointer;
-        z-index: 1000;
-    }
-    .chatbox {
-        position: fixed;
-        bottom: 90px;
-        right: 20px;
-        background-color: white;
-        border: 2px solid #ccc;
-        border-radius: 10px;
-        padding: 15px;
-        width: 300px;
-        max-height: 400px;
-        overflow-y: auto;
-        z-index: 1000;
-    }
-    .reset-button {
-        background-color: #ffcccc;
-        border: none;
-        padding: 5px 10px;
-        border-radius: 5px;
-        cursor: pointer;
-        margin-top: 10px;
     }
     </style>
 """, unsafe_allow_html=True)
 
-# ---------- STATE ---------- #
-if 'show_chat' not in st.session_state:
-    st.session_state.show_chat = False
-if 'selected_feeling' not in st.session_state:
-    st.session_state.selected_feeling = None
-if 'tip_index' not in st.session_state:
-    st.session_state.tip_index = 0
+# MOMLY avatar toggle logic
+if 'show_momly' not in st.session_state:
+    st.session_state['show_momly'] = False
 
-# ---------- MOMLY CONTENT ---------- #
-momly_data = {
-    "Sad": {
-        "message": "I'm here for you. It's okay to feel sad. Let's get through this together ❤️",
-        "tips": [
-            "Talk to a trusted friend 💌",
-            "Listen to calming music 🎵",
-            "Take a short walk 🏞️",
-            "Try journaling your feelings 📝",
-            "Do a deep breathing exercise 🧘",
-            "Look through happy memories 📸",
-            "Drink some warm tea 🍵"
-        ],
-        "video": "https://www.youtube.com/watch?v=92i5m3tV5XY"
-    },
-    "Tired": {
-        "message": "Rest is essential. Let's take care of your energy first. 🌙",
-        "tips": [
-            "Lie down and close your eyes for 10 minutes",
-            "Drink a glass of water",
-            "Reduce screen time",
-            "Stretch your body",
-            "Take a power nap",
-            "Ask for help if you need it",
-            "Don’t be hard on yourself"
-        ],
-        "video": "https://www.youtube.com/watch?v=ZToicYcHIOU"
-    },
-    # Add more feelings here as needed
-}
+# Show greeting
+st.markdown("### Hi, I'm **MOMLY**! How are you feeling today?")
 
-# ---------- CHATBOT UI ---------- #
+# Mood buttons
+cols = st.columns([1, 1])
+with cols[0]:
+    st.button("Sad", key="sad")
+with cols[1]:
+    st.button("Tired", key="tired")
 
-# MOMLY AVATAR
-avatar_path = "https://cdn-icons-png.flaticon.com/512/706/706830.png"  # replace with your own if needed
-st.markdown(f"<img src='{avatar_path}' class='avatar' onclick='window.location.reload();' />", unsafe_allow_html=True)
+# -- Removed the predictor and start test section --
 
-# If avatar clicked (simulated by refresh for now)
-if st.session_state.show_chat:
-    st.markdown("<div class='chatbox'>", unsafe_allow_html=True)
+# Insert your chatbot logic inside this function
+def show_momly_chat():
+    st.markdown("#### 💬 MOMLY is here to chat with you")
+    user_input = st.text_input("Type your message...", key="momly_input")
+    if user_input:
+        st.write("👩‍⚕️ MOMLY:", "You're not alone. I'm here for you 💖")  # Replace with real logic
+        # Add more rule-based or tip-based responses here
 
-    if not st.session_state.selected_feeling:
-        st.write("Hi, I'm MOMLY! How are you feeling today?")
-        cols = st.columns(3)
-        for i, feeling in enumerate(momly_data.keys()):
-            if cols[i % 3].button(feeling):
-                st.session_state.selected_feeling = feeling
-                st.session_state.tip_index = 0
-    else:
-        data = momly_data[st.session_state.selected_feeling]
-        st.write(data['message'])
-        if st.session_state.tip_index < len(data['tips']):
-            if st.button("Next Tip"):
-                st.session_state.tip_index += 1
-        if st.session_state.tip_index < len(data['tips']):
-            st.write("✅ " + data['tips'][st.session_state.tip_index])
-        else:
-            st.write("You're doing great. Here's a calming video:")
-            st.video(data['video'])
-
-        if st.button("Reset Chat", key="reset_chat"):
-            st.session_state.selected_feeling = None
-            st.session_state.tip_index = 0
-
-    st.markdown("</div>", unsafe_allow_html=True)
-else:
-    if st.button("💬 MOMLY Chat", key="open_chat"):
-        st.session_state.show_chat = True
-
-# ---------- MAIN CONTENT ---------- #
-st.title("PREDICTOR")
-st.markdown("### Empowering maternal health through smart technology")
-
-col1, col2 = st.columns([1, 2])
-with col1:
-    if st.button("🚀 Start Test", use_container_width=True):
-        time.sleep(0.3)
-        switch_page("Take Test")
-
-with col2:
-    st.markdown("""
-    <div style='margin-top: 50px;'>
-        <h5 style='color: deeppink;'>💬 MOMLY is here for you</h5>
+# Floating avatar image
+avatar = Image.open("ce092388-046f-47ab-a503-0e19bcc8ff4e.png")
+st.markdown(
+    f"""
+    <div class="avatar-container">
+        <img src="data:image/png;base64,{st.image(avatar, use_column_width=False).image_to_url()}" width="60" onclick="window.location.reload()">
     </div>
-    """, unsafe_allow_html=True)
+    """,
+    unsafe_allow_html=True
+)
 
-# Optional: feel tips directly below
-st.markdown("<hr>", unsafe_allow_html=True)
+# Workaround: Clickable avatar button to toggle chat
+if st.button("🧕 Chat with MOMLY", key="momly_toggle"):
+    st.session_state['show_momly'] = not st.session_state['show_momly']
+
+# Show chatbot only when toggled
+if st.session_state['show_momly']:
+    show_momly_chat()
+
