@@ -12,29 +12,7 @@ st.set_page_config(page_title="PPD Risk Predictor", page_icon="🧠", layout="wi
 model = joblib.load("ppd_model_pipeline.pkl")
 le = joblib.load("label_encoder.pkl")
 
-  # Set background image
-def set_background():
-    st.markdown(
-        f"""
-        <style>
-        .stApp {{
-            background-image: url("background.png");
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-        }}
-
-        .main > div:first-child {{
-            background-color: rgba(0, 0, 0, 0.6);  /* semi-transparent dark overlay for readability */
-            padding: 2rem;
-            border-radius: 10px;
-        }}
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
-
-set_background()
+# Set animated background with image
 def add_page_animation():
     st.markdown("""
     <style>
@@ -54,6 +32,7 @@ def add_page_animation():
     </style>
     """, unsafe_allow_html=True)
 
+add_page_animation()
 
 # Sidebar navigation
 if "page" not in st.session_state:
