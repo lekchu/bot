@@ -38,7 +38,7 @@ add_page_animation()
 if "page" not in st.session_state:
     st.session_state.page = "🏠 Home"
     with st.sidebar:
-    st.image("background.png", width=200)  # Adjust width as needed
+      st.image("background.png", width=200)  # Adjust width as needed
 
 st.session_state.page = st.sidebar.radio(
     "Navigate",
