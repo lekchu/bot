@@ -488,7 +488,7 @@ if st.session_state['show_chat']:
 
 # --- Footer ---
 st.markdown("""
-    <hr style="border: 1px solid #ccc;">
+
     <div style="text-align: center; padding: 10px 0; color: #aaa; font-size: 0.9em;">
         © 2025 MOMLY | Empowering Maternal Wellbeing 
     </div>
